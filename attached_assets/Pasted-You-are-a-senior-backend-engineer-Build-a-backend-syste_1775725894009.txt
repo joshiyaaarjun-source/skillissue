@@ -1,0 +1,102 @@
+You are a senior backend engineer.
+
+Build a backend system for a peer-to-peer skill exchange platform called "Skillissu".
+
+-----------------------------------
+🛠️ TECH STACK
+-----------------------------------
+- Node.js (Express)
+- MongoDB OR Firebase
+- REST API
+- Modular architecture
+
+-----------------------------------
+🔐 AUTH
+-----------------------------------
+- Google OAuth (mock allowed)
+- Create/retrieve user
+
+-----------------------------------
+👤 USER MODEL
+-----------------------------------
+- userId
+- name
+- email
+- skillsOffered
+- skillsWanted
+- skillTBR
+- monthlyGoals
+- creditBalance
+- credibilityScore
+- totalExchanges
+
+-----------------------------------
+🔁 SWIPE LOGIC
+-----------------------------------
+- Store swipe (left/right)
+- Prevent duplicates
+- If mutual right → create match
+
+-----------------------------------
+💚 MATCH MODEL
+-----------------------------------
+- matchId
+- userA
+- userB
+
+-----------------------------------
+🤝 EXCHANGE SYSTEM
+-----------------------------------
+- Create exchange
+- Complete exchange
+- Verify exchange
+
+-----------------------------------
+💳 CREDIT SYSTEM
+-----------------------------------
+- Earn when teaching
+- Spend when learning
+- Prevent negative balance
+- Store transaction history
+
+-----------------------------------
+📊 REPUTATION
+-----------------------------------
+- Ratings after exchange
+- Update credibility score
+
+-----------------------------------
+📒 LEDGER
+-----------------------------------
+- Immutable record of exchanges
+
+-----------------------------------
+🔔 EVENTS
+-----------------------------------
+Log events:
+- MATCH_CREATED
+- EXCHANGE_COMPLETED
+- CREDITS_UPDATED
+
+-----------------------------------
+📡 API ENDPOINTS
+-----------------------------------
+- /auth/google
+- /users
+- /swipe
+- /matches
+- /exchange
+- /credits
+- /ledger
+
+-----------------------------------
+📦 OUTPUT
+-----------------------------------
+- Folder structure
+- Models
+- Controllers
+- Routes
+- Core logic
+- Sample API responses
+
+Keep it clean, hackathon-ready, and functional.

@@ -3,20 +3,40 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Skillissu - Peer-to-peer skill exchange platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: users
+    description: User management
+  - name: swipe
+    description: Swipe/matching system
+  - name: matches
+    description: Match management
+  - name: exchange
+    description: Skill exchange system
+  - name: credits
+    description: Credit system
+  - name: gamification
+    description: Streaks, badges, XP
+  - name: nudges
+    description: AI nudge suggestions
+  - name: notifications
+    description: Push notifications
+  - name: analytics
+    description: Analytics and stats
+  - name: ledger
+    description: Exchange ledger
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +44,223 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /users/me:
+    get:
+      operationId: getMe
+      tags: [users]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{userId}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: Get user by ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/explore:
+    get:
+      operationId: getExploreUsers
+      tags: [users]
+      summary: Get users to explore/swipe
+      responses:
+        "200":
+          description: List of users to explore
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExploreUser"
+
+  /swipe:
+    post:
+      operationId: recordSwipe
+      tags: [swipe]
+      summary: Record a swipe (left or right)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SwipeBody"
+      responses:
+        "200":
+          description: Swipe recorded, match info if matched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SwipeResult"
+
+  /matches:
+    get:
+      operationId: getMatches
+      tags: [matches]
+      summary: Get all matches for current user
+      responses:
+        "200":
+          description: List of matches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Match"
+
+  /exchange:
+    post:
+      operationId: createExchange
+      tags: [exchange]
+      summary: Create a skill exchange
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateExchangeBody"
+      responses:
+        "200":
+          description: Exchange created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exchange"
+    get:
+      operationId: getExchanges
+      tags: [exchange]
+      summary: Get recent exchanges for current user
+      responses:
+        "200":
+          description: List of exchanges
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Exchange"
+
+  /exchange/{exchangeId}/complete:
+    post:
+      operationId: completeExchange
+      tags: [exchange]
+      summary: Mark an exchange as complete
+      parameters:
+        - name: exchangeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Exchange completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exchange"
+
+  /credits:
+    get:
+      operationId: getCreditBalance
+      tags: [credits]
+      summary: Get credit balance and transaction history
+      responses:
+        "200":
+          description: Credit info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreditInfo"
+
+  /gamification/me:
+    get:
+      operationId: getGamification
+      tags: [gamification]
+      summary: Get current user gamification data (streaks, badges, XP)
+      responses:
+        "200":
+          description: Gamification data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GamificationData"
+
+  /nudges:
+    get:
+      operationId: getNudges
+      tags: [nudges]
+      summary: Get AI nudge suggestions for current user
+      responses:
+        "200":
+          description: List of nudges
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Nudge"
+
+  /notifications:
+    get:
+      operationId: getNotifications
+      tags: [notifications]
+      summary: Get notifications for current user
+      responses:
+        "200":
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+
+  /analytics/me:
+    get:
+      operationId: getMyAnalytics
+      tags: [analytics]
+      summary: Get analytics for current user
+      responses:
+        "200":
+          description: User analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAnalytics"
+
+  /ledger:
+    get:
+      operationId: getLedger
+      tags: [ledger]
+      summary: Get exchange ledger entries
+      responses:
+        "200":
+          description: Ledger entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LedgerEntry"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +271,445 @@ components:
       required:
         - status
 
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        avatar:
+          type: string
+        skillsOffered:
+          type: array
+          items:
+            type: string
+        skillsWanted:
+          type: array
+          items:
+            type: string
+        skillTBR:
+          type: array
+          items:
+            type: string
+        creditBalance:
+          type: number
+        credibilityScore:
+          type: number
+        totalExchanges:
+          type: number
+        streakDays:
+          type: number
+        xp:
+          type: number
+        monthlyGoals:
+          type: array
+          items:
+            $ref: "#/components/schemas/MonthlyGoal"
+        skillProgress:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkillProgress"
+      required:
+        - id
+        - name
+        - email
+        - skillsOffered
+        - skillsWanted
+        - skillTBR
+        - creditBalance
+        - credibilityScore
+        - totalExchanges
+        - streakDays
+        - xp
+        - monthlyGoals
+        - skillProgress
+
+    MonthlyGoal:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        progress:
+          type: number
+        target:
+          type: number
+      required:
+        - id
+        - title
+        - progress
+        - target
+
+    SkillProgress:
+      type: object
+      properties:
+        id:
+          type: string
+        skill:
+          type: string
+        status:
+          type: string
+          enum: [completed, in_progress, to_start]
+        progress:
+          type: number
+      required:
+        - id
+        - skill
+        - status
+        - progress
+
+    ExploreUser:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        avatar:
+          type: string
+        skillsOffered:
+          type: array
+          items:
+            type: string
+        skillsWanted:
+          type: array
+          items:
+            type: string
+        credits:
+          type: number
+        credibilityScore:
+          type: number
+        bio:
+          type: string
+        matchScore:
+          type: number
+        overlappingSkills:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - name
+        - skillsOffered
+        - skillsWanted
+        - credits
+        - credibilityScore
+        - matchScore
+        - overlappingSkills
+
+    SwipeBody:
+      type: object
+      properties:
+        targetUserId:
+          type: string
+        direction:
+          type: string
+          enum: [left, right]
+      required:
+        - targetUserId
+        - direction
+
+    SwipeResult:
+      type: object
+      properties:
+        matched:
+          type: boolean
+        matchId:
+          type: string
+        matchedUser:
+          $ref: "#/components/schemas/ExploreUser"
+      required:
+        - matched
+
+    Match:
+      type: object
+      properties:
+        id:
+          type: string
+        matchedUser:
+          $ref: "#/components/schemas/ExploreUser"
+        createdAt:
+          type: string
+        overlappingSkills:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [pending, active, completed]
+      required:
+        - id
+        - matchedUser
+        - createdAt
+        - overlappingSkills
+        - status
+
+    CreateExchangeBody:
+      type: object
+      properties:
+        matchId:
+          type: string
+        teachSkill:
+          type: string
+        learnSkill:
+          type: string
+        creditsPerSession:
+          type: number
+      required:
+        - matchId
+        - teachSkill
+        - learnSkill
+        - creditsPerSession
+
+    Exchange:
+      type: object
+      properties:
+        id:
+          type: string
+        matchId:
+          type: string
+        partnerName:
+          type: string
+        partnerAvatar:
+          type: string
+        teachSkill:
+          type: string
+        learnSkill:
+          type: string
+        creditsPerSession:
+          type: number
+        status:
+          type: string
+          enum: [pending, active, completed]
+        createdAt:
+          type: string
+      required:
+        - id
+        - matchId
+        - partnerName
+        - teachSkill
+        - learnSkill
+        - creditsPerSession
+        - status
+        - createdAt
+
+    CreditInfo:
+      type: object
+      properties:
+        balance:
+          type: number
+        totalEarned:
+          type: number
+        totalSpent:
+          type: number
+        transactions:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreditTransaction"
+      required:
+        - balance
+        - totalEarned
+        - totalSpent
+        - transactions
+
+    CreditTransaction:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [earned, spent]
+        amount:
+          type: number
+        description:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - type
+        - amount
+        - description
+        - createdAt
+
+    GamificationData:
+      type: object
+      properties:
+        streakDays:
+          type: number
+        longestStreak:
+          type: number
+        xp:
+          type: number
+        level:
+          type: number
+        badges:
+          type: array
+          items:
+            $ref: "#/components/schemas/Badge"
+        nextBadge:
+          $ref: "#/components/schemas/Badge"
+      required:
+        - streakDays
+        - longestStreak
+        - xp
+        - level
+        - badges
+
+    Badge:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        earned:
+          type: boolean
+        earnedAt:
+          type: string
+        progress:
+          type: number
+        target:
+          type: number
+      required:
+        - id
+        - name
+        - description
+        - icon
+        - earned
+
+    Nudge:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [unused_credits, skill_match, streak_reminder, goal_progress, new_match]
+        message:
+          type: string
+        actionLabel:
+          type: string
+        actionRoute:
+          type: string
+        priority:
+          type: string
+          enum: [low, medium, high]
+      required:
+        - id
+        - type
+        - message
+        - priority
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [match, credit_earned, credit_spent, inactivity, goal_progress]
+        tone:
+          type: string
+          enum: [soft, roast, hype]
+        message:
+          type: string
+        read:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - id
+        - type
+        - tone
+        - message
+        - read
+        - createdAt
+
+    UserAnalytics:
+      type: object
+      properties:
+        totalExchanges:
+          type: number
+        creditsEarned:
+          type: number
+        creditsSpent:
+          type: number
+        skillsLearned:
+          type: array
+          items:
+            type: string
+        skillsTaught:
+          type: array
+          items:
+            type: string
+        exchangesByMonth:
+          type: array
+          items:
+            $ref: "#/components/schemas/MonthlyExchangeCount"
+        topSkills:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkillStat"
+      required:
+        - totalExchanges
+        - creditsEarned
+        - creditsSpent
+        - skillsLearned
+        - skillsTaught
+        - exchangesByMonth
+        - topSkills
+
+    MonthlyExchangeCount:
+      type: object
+      properties:
+        month:
+          type: string
+        count:
+          type: number
+      required:
+        - month
+        - count
+
+    SkillStat:
+      type: object
+      properties:
+        skill:
+          type: string
+        count:
+          type: number
+      required:
+        - skill
+        - count
+
+    LedgerEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        eventType:
+          type: string
+          enum: [MATCH_CREATED, EXCHANGE_COMPLETED, CREDITS_UPDATED]
+        description:
+          type: string
+        userId:
+          type: string
+        metadata:
+          type: object
+        createdAt:
+          type: string
+      required:
+        - id
+        - eventType
+        - description
+        - userId
+        - createdAt

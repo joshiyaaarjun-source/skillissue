@@ -1,0 +1,143 @@
+You are a senior frontend engineer and product designer.
+
+Build a modern, mobile-first web application UI for a peer-to-peer skill exchange platform called "Skillissu".
+
+The app allows users to learn and teach skills using a credit-based system, with swipe-based matching similar to dating apps.
+
+-----------------------------------
+🎯 GOAL
+-----------------------------------
+Create a clean, interactive, hackathon-ready frontend that demonstrates:
+
+- Authentication flow
+- Profile dashboard
+- Swipe-based explore system
+- Matches and skill exchange flow
+
+-----------------------------------
+🛠️ TECH STACK
+-----------------------------------
+- React.js (or Next.js)
+- Tailwind CSS
+- Component-based architecture
+- Use mock data (no real backend required)
+- State management using useState/useContext
+
+-----------------------------------
+📱 APP FLOW
+-----------------------------------
+
+1. LOGIN SCREEN
+- “Continue with Google” button (mock)
+- On click → redirect to Profile Dashboard
+
+-----------------------------------
+2. PROFILE DASHBOARD (HOME)
+-----------------------------------
+
+Display:
+
+- User name + avatar
+- Credit balance
+- Credibility score (stars or bar)
+
+Sections:
+
+1. Skill Progress Tracker
+   - Completed
+   - In Progress
+   - To Start
+
+2. Skill TBR List
+   - Skills user wants to learn
+
+3. Monthly Goals
+   - Progress bars
+
+4. Skills:
+   - Skills Offered (tags)
+   - Skills Wanted (tags)
+
+5. Recent Exchanges (mock list)
+
+-----------------------------------
+3. EXPLORE PAGE (SWIPE UI)
+-----------------------------------
+
+- Card-based UI (Tinder-style)
+- Each card shows:
+  - Name
+  - Skills offered
+  - Skills wanted
+  - Credits
+  - Credibility score
+
+Interactions:
+- Swipe Left → Reject
+- Swipe Right → Like
+- On Right Swipe → animate card + store match (mock)
+
+Highlight:
+- Matching skills should be visually emphasized
+
+-----------------------------------
+4. MATCHES PAGE
+-----------------------------------
+
+- List of matched users
+- Each match card shows:
+  - Name
+  - Rating
+  - Skills overlap
+
+On click:
+→ Open exchange modal
+
+-----------------------------------
+5. SKILL EXCHANGE MODAL
+-----------------------------------
+
+- Select:
+  - Skill you teach
+  - Skill you learn
+  - Credits per session
+
+Buttons:
+- Confirm
+- Cancel
+
+On confirm:
+- Add to “Recent Exchanges” (mock)
+
+-----------------------------------
+🎨 DESIGN STYLE
+-----------------------------------
+
+- Modern, clean, Gen Z friendly
+- Gradient colors (purple/blue)
+- Rounded cards (2xl)
+- Smooth animations
+- Mobile-first layout
+
+-----------------------------------
+✨ UX DETAILS
+-----------------------------------
+
+- Smooth swipe animations
+- Hover + tap feedback
+- Match success popup (“It’s a match… but for skills”)
+- Credit changes visually reflected
+
+-----------------------------------
+📦 OUTPUT
+-----------------------------------
+
+Provide:
+
+- Full React component code
+- Clean folder structure
+- Reusable components (Card, Navbar, Modal)
+- Mock data for users
+- Functional interactions
+
+Make it demo-ready and visually impressive.

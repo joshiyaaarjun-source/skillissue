@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Skillissu"
+version = "1.0.0"
+id = "artifacts/skillissu"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24898
+
+[services.development]
+run = "pnpm --filter @workspace/skillissu run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/skillissu", "run", "build" ]
+publicDir = "artifacts/skillissu/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24898"
+BASE_PATH = "/"
