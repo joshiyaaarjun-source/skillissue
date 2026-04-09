@@ -22,6 +22,7 @@ export const GetMeResponse = zod.object({
   name: zod.string(),
   email: zod.string(),
   avatar: zod.string().optional(),
+  bio: zod.string().optional(),
   skillsOffered: zod.array(zod.string()),
   skillsWanted: zod.array(zod.string()),
   skillTBR: zod.array(zod.string()),
@@ -30,6 +31,7 @@ export const GetMeResponse = zod.object({
   totalExchanges: zod.number(),
   streakDays: zod.number(),
   xp: zod.number(),
+  onboarded: zod.boolean(),
   monthlyGoals: zod.array(
     zod.object({
       id: zod.string(),
@@ -60,6 +62,7 @@ export const GetUserResponse = zod.object({
   name: zod.string(),
   email: zod.string(),
   avatar: zod.string().optional(),
+  bio: zod.string().optional(),
   skillsOffered: zod.array(zod.string()),
   skillsWanted: zod.array(zod.string()),
   skillTBR: zod.array(zod.string()),
@@ -68,6 +71,7 @@ export const GetUserResponse = zod.object({
   totalExchanges: zod.number(),
   streakDays: zod.number(),
   xp: zod.number(),
+  onboarded: zod.boolean(),
   monthlyGoals: zod.array(
     zod.object({
       id: zod.string(),
@@ -100,8 +104,54 @@ export const GetExploreUsersResponseItem = zod.object({
   bio: zod.string().optional(),
   matchScore: zod.number(),
   overlappingSkills: zod.array(zod.string()),
+  verificationStatus: zod.enum(["unverified", "partial", "fully_verified"]),
+  exchangeCount: zod.number(),
+  isNew: zod.boolean(),
 });
 export const GetExploreUsersResponse = zod.array(GetExploreUsersResponseItem);
+
+/**
+ * @summary Save onboarding data and mark user as onboarded
+ */
+export const CompleteOnboardingBody = zod.object({
+  name: zod.string(),
+  skillsOffered: zod.array(zod.string()),
+  skillsWanted: zod.array(zod.string()),
+  availability: zod.string().optional(),
+});
+
+export const CompleteOnboardingResponse = zod.object({
+  id: zod.string(),
+  name: zod.string(),
+  email: zod.string(),
+  avatar: zod.string().optional(),
+  bio: zod.string().optional(),
+  skillsOffered: zod.array(zod.string()),
+  skillsWanted: zod.array(zod.string()),
+  skillTBR: zod.array(zod.string()),
+  creditBalance: zod.number(),
+  credibilityScore: zod.number(),
+  totalExchanges: zod.number(),
+  streakDays: zod.number(),
+  xp: zod.number(),
+  onboarded: zod.boolean(),
+  monthlyGoals: zod.array(
+    zod.object({
+      id: zod.string(),
+      title: zod.string(),
+      progress: zod.number(),
+      target: zod.number(),
+    }),
+  ),
+  skillProgress: zod.array(
+    zod.object({
+      id: zod.string(),
+      skill: zod.string(),
+      status: zod.enum(["completed", "in_progress", "to_start"]),
+      progress: zod.number(),
+    }),
+  ),
+});
 
 /**
  * @summary Record a swipe (left or right)
@@ -126,6 +176,9 @@ export const RecordSwipeResponse = zod.object({
       bio: zod.string().optional(),
       matchScore: zod.number(),
       overlappingSkills: zod.array(zod.string()),
+      verificationStatus: zod.enum(["unverified", "partial", "fully_verified"]),
+      exchangeCount: zod.number(),
+      isNew: zod.boolean(),
     })
     .optional(),
 });
@@ -146,6 +199,9 @@ export const GetMatchesResponseItem = zod.object({
     bio: zod.string().optional(),
     matchScore: zod.number(),
     overlappingSkills: zod.array(zod.string()),
+    verificationStatus: zod.enum(["unverified", "partial", "fully_verified"]),
+    exchangeCount: zod.number(),
+    isNew: zod.boolean(),
   }),
   createdAt: zod.string(),
   overlappingSkills: zod.array(zod.string()),
@@ -339,3 +395,140 @@ export const GetLedgerResponseItem = zod.object({
   createdAt: zod.string(),
 });
 export const GetLedgerResponse = zod.array(GetLedgerResponseItem);
+
+/**
+ * @summary Get chat messages for a match
+ */
+export const GetChatMessagesParams = zod.object({
+  matchId: zod.coerce.string(),
+});
+
+export const GetChatMessagesResponseItem = zod.object({
+  id: zod.string(),
+  matchId: zod.string(),
+  senderId: zod.string(),
+  senderName: zod.string(),
+  text: zod.string(),
+  isMine: zod.boolean(),
+  createdAt: zod.string(),
+});
+export const GetChatMessagesResponse = zod.array(GetChatMessagesResponseItem);
+
+/**
+ * @summary Send a chat message
+ */
+export const SendChatMessageParams = zod.object({
+  matchId: zod.coerce.string(),
+});
+
+export const SendChatMessageBody = zod.object({
+  text: zod.string(),
+});
+
+export const SendChatMessageResponse = zod.object({
+  id: zod.string(),
+  matchId: zod.string(),
+  senderId: zod.string(),
+  senderName: zod.string(),
+  text: zod.string(),
+  isMine: zod.boolean(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary Get list of all chats (one per match)
+ */
+export const GetChatListResponseItem = zod.object({
+  matchId: zod.string(),
+  partner: zod.object({
+    id: zod.string(),
+    name: zod.string(),
+    avatar: zod.string().optional(),
+    skillsOffered: zod.array(zod.string()),
+    skillsWanted: zod.array(zod.string()),
+    credits: zod.number(),
+    credibilityScore: zod.number(),
+    bio: zod.string().optional(),
+    matchScore: zod.number(),
+    overlappingSkills: zod.array(zod.string()),
+    verificationStatus: zod.enum(["unverified", "partial", "fully_verified"]),
+    exchangeCount: zod.number(),
+    isNew: zod.boolean(),
+  }),
+  lastMessage: zod.string().optional(),
+  lastMessageAt: zod.string().optional(),
+  unreadCount: zod.number(),
+});
+export const GetChatListResponse = zod.array(GetChatListResponseItem);
+
+/**
+ * @summary Generate a skill verification quiz using AI
+ */
+export const GenerateQuizBody = zod.object({
+  skill: zod.string(),
+});
+
+export const GenerateQuizResponse = zod.object({
+  skill: zod.string(),
+  questions: zod.array(
+    zod.object({
+      question: zod.string(),
+      options: zod.array(zod.string()),
+      correctIndex: zod.number(),
+    }),
+  ),
+});
+
+/**
+ * @summary Submit quiz answers for a skill
+ */
+export const SubmitQuizBody = zod.object({
+  skill: zod.string(),
+  answers: zod.array(zod.number()),
+  questions: zod.array(
+    zod.object({
+      question: zod.string(),
+      options: zod.array(zod.string()),
+      correctIndex: zod.number(),
+    }),
+  ),
+});
+
+export const SubmitQuizResponse = zod.object({
+  passed: zod.boolean(),
+  score: zod.number(),
+  total: zod.number(),
+  skill: zod.string(),
+  message: zod.string(),
+});
+
+/**
+ * @summary Upload a verification document (mock)
+ */
+export const UploadVerificationDocBody = zod.object({
+  skill: zod.string(),
+  docName: zod.string(),
+  docType: zod.string(),
+});
+
+export const UploadVerificationDocResponse = zod.object({
+  id: zod.string(),
+  skill: zod.string(),
+  docName: zod.string(),
+  docType: zod.string(),
+  status: zod.enum(["pending", "approved", "rejected"]),
+  uploadedAt: zod.string(),
+});
+
+/**
+ * @summary Get skill verification status for current user
+ */
+export const GetVerificationStatusResponseItem = zod.object({
+  skill: zod.string(),
+  quizPassed: zod.boolean(),
+  docUploaded: zod.boolean(),
+  status: zod.enum(["unverified", "quiz_passed", "fully_verified"]),
+});
+export const GetVerificationStatusResponse = zod.array(
+  GetVerificationStatusResponseItem,
+);

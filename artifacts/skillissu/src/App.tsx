@@ -10,6 +10,12 @@ import Explore from "@/pages/Explore";
 import Matches from "@/pages/Matches";
 import Analytics from "@/pages/Analytics";
 import Gamification from "@/pages/Gamification";
+import Onboarding from "@/pages/Onboarding";
+import Profile from "@/pages/Profile";
+import ChatList from "@/pages/ChatList";
+import Chat from "@/pages/Chat";
+import Quiz from "@/pages/Quiz";
+import Upload from "@/pages/Upload";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +28,12 @@ function Router() {
       <Route path="/matches" component={Matches} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/gamification" component={Gamification} />
+      <Route path="/onboarding" component={Onboarding} />
+      <Route path="/profile" component={Profile} />
+      <Route path="/chat" component={ChatList} />
+      <Route path="/chat/:matchId" component={Chat} />
+      <Route path="/quiz" component={Quiz} />
+      <Route path="/upload" component={Upload} />
       <Route component={NotFound} />
     </Switch>
   );

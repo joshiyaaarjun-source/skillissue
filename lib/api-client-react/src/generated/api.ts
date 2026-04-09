@@ -17,20 +17,31 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  ChatMessage,
+  ChatSummary,
   CreateExchangeBody,
   CreditInfo,
   Exchange,
   ExploreUser,
   GamificationData,
+  GenerateQuizBody,
   HealthStatus,
   LedgerEntry,
   Match,
   Notification,
   Nudge,
+  OnboardingBody,
+  Quiz,
+  QuizResult,
+  SendMessageBody,
+  SkillVerification,
+  SubmitQuizBody,
   SwipeBody,
   SwipeResult,
+  UploadDocBody,
   User,
   UserAnalytics,
+  VerificationDoc,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -331,6 +342,92 @@ export function useGetExploreUsers<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * @summary Save onboarding data and mark user as onboarded
+ */
+export const getCompleteOnboardingUrl = () => {
+  return `/api/onboarding/complete`;
+};
+
+export const completeOnboarding = async (
+  onboardingBody: OnboardingBody,
+  options?: RequestInit,
+): Promise<User> => {
+  return customFetch<User>(getCompleteOnboardingUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(onboardingBody),
+  });
+};
+
+export const getCompleteOnboardingMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof completeOnboarding>>,
+    TError,
+    { data: BodyType<OnboardingBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof completeOnboarding>>,
+  TError,
+  { data: BodyType<OnboardingBody> },
+  TContext
+> => {
+  const mutationKey = ["completeOnboarding"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof completeOnboarding>>,
+    { data: BodyType<OnboardingBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return completeOnboarding(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CompleteOnboardingMutationResult = NonNullable<
+  Awaited<ReturnType<typeof completeOnboarding>>
+>;
+export type CompleteOnboardingMutationBody = BodyType<OnboardingBody>;
+export type CompleteOnboardingMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Save onboarding data and mark user as onboarded
+ */
+export const useCompleteOnboarding = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof completeOnboarding>>,
+    TError,
+    { data: BodyType<OnboardingBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof completeOnboarding>>,
+  TError,
+  { data: BodyType<OnboardingBody> },
+  TContext
+> => {
+  return useMutation(getCompleteOnboardingMutationOptions(options));
+};
 
 /**
  * @summary Record a swipe (left or right)
@@ -1160,6 +1257,589 @@ export function useGetLedger<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getGetLedgerQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get chat messages for a match
+ */
+export const getGetChatMessagesUrl = (matchId: string) => {
+  return `/api/chat/${matchId}/messages`;
+};
+
+export const getChatMessages = async (
+  matchId: string,
+  options?: RequestInit,
+): Promise<ChatMessage[]> => {
+  return customFetch<ChatMessage[]>(getGetChatMessagesUrl(matchId), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetChatMessagesQueryKey = (matchId: string) => {
+  return [`/api/chat/${matchId}/messages`] as const;
+};
+
+export const getGetChatMessagesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getChatMessages>>,
+  TError = ErrorType<unknown>,
+>(
+  matchId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getChatMessages>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetChatMessagesQueryKey(matchId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getChatMessages>>> = ({
+    signal,
+  }) => getChatMessages(matchId, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!matchId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getChatMessages>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetChatMessagesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getChatMessages>>
+>;
+export type GetChatMessagesQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get chat messages for a match
+ */
+
+export function useGetChatMessages<
+  TData = Awaited<ReturnType<typeof getChatMessages>>,
+  TError = ErrorType<unknown>,
+>(
+  matchId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getChatMessages>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetChatMessagesQueryOptions(matchId, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Send a chat message
+ */
+export const getSendChatMessageUrl = (matchId: string) => {
+  return `/api/chat/${matchId}/messages`;
+};
+
+export const sendChatMessage = async (
+  matchId: string,
+  sendMessageBody: SendMessageBody,
+  options?: RequestInit,
+): Promise<ChatMessage> => {
+  return customFetch<ChatMessage>(getSendChatMessageUrl(matchId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(sendMessageBody),
+  });
+};
+
+export const getSendChatMessageMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof sendChatMessage>>,
+    TError,
+    { matchId: string; data: BodyType<SendMessageBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof sendChatMessage>>,
+  TError,
+  { matchId: string; data: BodyType<SendMessageBody> },
+  TContext
+> => {
+  const mutationKey = ["sendChatMessage"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof sendChatMessage>>,
+    { matchId: string; data: BodyType<SendMessageBody> }
+  > = (props) => {
+    const { matchId, data } = props ?? {};
+
+    return sendChatMessage(matchId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SendChatMessageMutationResult = NonNullable<
+  Awaited<ReturnType<typeof sendChatMessage>>
+>;
+export type SendChatMessageMutationBody = BodyType<SendMessageBody>;
+export type SendChatMessageMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Send a chat message
+ */
+export const useSendChatMessage = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof sendChatMessage>>,
+    TError,
+    { matchId: string; data: BodyType<SendMessageBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof sendChatMessage>>,
+  TError,
+  { matchId: string; data: BodyType<SendMessageBody> },
+  TContext
+> => {
+  return useMutation(getSendChatMessageMutationOptions(options));
+};
+
+/**
+ * @summary Get list of all chats (one per match)
+ */
+export const getGetChatListUrl = () => {
+  return `/api/chat/list`;
+};
+
+export const getChatList = async (
+  options?: RequestInit,
+): Promise<ChatSummary[]> => {
+  return customFetch<ChatSummary[]>(getGetChatListUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetChatListQueryKey = () => {
+  return [`/api/chat/list`] as const;
+};
+
+export const getGetChatListQueryOptions = <
+  TData = Awaited<ReturnType<typeof getChatList>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getChatList>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetChatListQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getChatList>>> = ({
+    signal,
+  }) => getChatList({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getChatList>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetChatListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getChatList>>
+>;
+export type GetChatListQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get list of all chats (one per match)
+ */
+
+export function useGetChatList<
+  TData = Awaited<ReturnType<typeof getChatList>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getChatList>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetChatListQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Generate a skill verification quiz using AI
+ */
+export const getGenerateQuizUrl = () => {
+  return `/api/verification/quiz`;
+};
+
+export const generateQuiz = async (
+  generateQuizBody: GenerateQuizBody,
+  options?: RequestInit,
+): Promise<Quiz> => {
+  return customFetch<Quiz>(getGenerateQuizUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(generateQuizBody),
+  });
+};
+
+export const getGenerateQuizMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateQuiz>>,
+    TError,
+    { data: BodyType<GenerateQuizBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof generateQuiz>>,
+  TError,
+  { data: BodyType<GenerateQuizBody> },
+  TContext
+> => {
+  const mutationKey = ["generateQuiz"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof generateQuiz>>,
+    { data: BodyType<GenerateQuizBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return generateQuiz(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GenerateQuizMutationResult = NonNullable<
+  Awaited<ReturnType<typeof generateQuiz>>
+>;
+export type GenerateQuizMutationBody = BodyType<GenerateQuizBody>;
+export type GenerateQuizMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Generate a skill verification quiz using AI
+ */
+export const useGenerateQuiz = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateQuiz>>,
+    TError,
+    { data: BodyType<GenerateQuizBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof generateQuiz>>,
+  TError,
+  { data: BodyType<GenerateQuizBody> },
+  TContext
+> => {
+  return useMutation(getGenerateQuizMutationOptions(options));
+};
+
+/**
+ * @summary Submit quiz answers for a skill
+ */
+export const getSubmitQuizUrl = () => {
+  return `/api/verification/quiz/submit`;
+};
+
+export const submitQuiz = async (
+  submitQuizBody: SubmitQuizBody,
+  options?: RequestInit,
+): Promise<QuizResult> => {
+  return customFetch<QuizResult>(getSubmitQuizUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(submitQuizBody),
+  });
+};
+
+export const getSubmitQuizMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitQuiz>>,
+    TError,
+    { data: BodyType<SubmitQuizBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof submitQuiz>>,
+  TError,
+  { data: BodyType<SubmitQuizBody> },
+  TContext
+> => {
+  const mutationKey = ["submitQuiz"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof submitQuiz>>,
+    { data: BodyType<SubmitQuizBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return submitQuiz(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SubmitQuizMutationResult = NonNullable<
+  Awaited<ReturnType<typeof submitQuiz>>
+>;
+export type SubmitQuizMutationBody = BodyType<SubmitQuizBody>;
+export type SubmitQuizMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Submit quiz answers for a skill
+ */
+export const useSubmitQuiz = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitQuiz>>,
+    TError,
+    { data: BodyType<SubmitQuizBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof submitQuiz>>,
+  TError,
+  { data: BodyType<SubmitQuizBody> },
+  TContext
+> => {
+  return useMutation(getSubmitQuizMutationOptions(options));
+};
+
+/**
+ * @summary Upload a verification document (mock)
+ */
+export const getUploadVerificationDocUrl = () => {
+  return `/api/verification/upload`;
+};
+
+export const uploadVerificationDoc = async (
+  uploadDocBody: UploadDocBody,
+  options?: RequestInit,
+): Promise<VerificationDoc> => {
+  return customFetch<VerificationDoc>(getUploadVerificationDocUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(uploadDocBody),
+  });
+};
+
+export const getUploadVerificationDocMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof uploadVerificationDoc>>,
+    TError,
+    { data: BodyType<UploadDocBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof uploadVerificationDoc>>,
+  TError,
+  { data: BodyType<UploadDocBody> },
+  TContext
+> => {
+  const mutationKey = ["uploadVerificationDoc"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof uploadVerificationDoc>>,
+    { data: BodyType<UploadDocBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return uploadVerificationDoc(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UploadVerificationDocMutationResult = NonNullable<
+  Awaited<ReturnType<typeof uploadVerificationDoc>>
+>;
+export type UploadVerificationDocMutationBody = BodyType<UploadDocBody>;
+export type UploadVerificationDocMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Upload a verification document (mock)
+ */
+export const useUploadVerificationDoc = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof uploadVerificationDoc>>,
+    TError,
+    { data: BodyType<UploadDocBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof uploadVerificationDoc>>,
+  TError,
+  { data: BodyType<UploadDocBody> },
+  TContext
+> => {
+  return useMutation(getUploadVerificationDocMutationOptions(options));
+};
+
+/**
+ * @summary Get skill verification status for current user
+ */
+export const getGetVerificationStatusUrl = () => {
+  return `/api/verification/status`;
+};
+
+export const getVerificationStatus = async (
+  options?: RequestInit,
+): Promise<SkillVerification[]> => {
+  return customFetch<SkillVerification[]>(getGetVerificationStatusUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetVerificationStatusQueryKey = () => {
+  return [`/api/verification/status`] as const;
+};
+
+export const getGetVerificationStatusQueryOptions = <
+  TData = Awaited<ReturnType<typeof getVerificationStatus>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getVerificationStatus>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetVerificationStatusQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getVerificationStatus>>
+  > = ({ signal }) => getVerificationStatus({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getVerificationStatus>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetVerificationStatusQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getVerificationStatus>>
+>;
+export type GetVerificationStatusQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get skill verification status for current user
+ */
+
+export function useGetVerificationStatus<
+  TData = Awaited<ReturnType<typeof getVerificationStatus>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getVerificationStatus>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetVerificationStatusQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

@@ -10,6 +10,9 @@ import nudgesRouter from "./nudges";
 import notificationsRouter from "./notifications";
 import analyticsRouter from "./analytics";
 import ledgerRouter from "./ledger";
+import chatRouter from "./chat";
+import verificationRouter from "./verification";
+import onboardingRouter from "./onboarding";
 
 const router: IRouter = Router();
 
@@ -24,5 +27,8 @@ router.use(nudgesRouter);
 router.use(notificationsRouter);
 router.use(analyticsRouter);
 router.use(ledgerRouter);
+router.use(chatRouter);
+router.use(verificationRouter);
+router.use(onboardingRouter);
 
 export default router;

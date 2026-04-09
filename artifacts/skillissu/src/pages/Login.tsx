@@ -28,10 +28,10 @@ export default function Login() {
           Skillissu
         </h1>
         <p className="text-xl mb-12 text-[#ffd9d9]/80 font-medium">
-          Trade what you know.<br/>Learn what you love.
+          We swiped right... on skills.
         </p>
 
-        <Link href="/dashboard" className="w-full block">
+        <Link href="/onboarding" className="w-full block">
           <Button 
             size="lg" 
             className="w-full h-14 bg-white text-[#4d0011] hover:bg-[#ffd9d9] text-lg font-bold rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all hover:scale-[1.02] active:scale-[0.98]"

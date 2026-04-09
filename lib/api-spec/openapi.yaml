@@ -12,6 +12,8 @@ tags:
     description: Health operations
   - name: users
     description: User management
+  - name: onboarding
+    description: Onboarding flow
   - name: swipe
     description: Swipe/matching system
   - name: matches
@@ -30,6 +32,10 @@ tags:
     description: Analytics and stats
   - name: ledger
     description: Exchange ledger
+  - name: chat
+    description: Chat system
+  - name: verification
+    description: Skill verification via quiz and documents
 
 paths:
   /healthz:
@@ -91,6 +97,25 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ExploreUser"
+
+  /onboarding/complete:
+    post:
+      operationId: completeOnboarding
+      tags: [onboarding]
+      summary: Save onboarding data and mark user as onboarded
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OnboardingBody"
+      responses:
+        "200":
+          description: Onboarding complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
 
   /swipe:
     post:
@@ -261,6 +286,137 @@ paths:
                 items:
                   $ref: "#/components/schemas/LedgerEntry"
 
+  /chat/{matchId}/messages:
+    get:
+      operationId: getChatMessages
+      tags: [chat]
+      summary: Get chat messages for a match
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChatMessage"
+    post:
+      operationId: sendChatMessage
+      tags: [chat]
+      summary: Send a chat message
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageBody"
+      responses:
+        "200":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatMessage"
+
+  /chat/list:
+    get:
+      operationId: getChatList
+      tags: [chat]
+      summary: Get list of all chats (one per match)
+      responses:
+        "200":
+          description: List of chats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChatSummary"
+
+  /verification/quiz:
+    post:
+      operationId: generateQuiz
+      tags: [verification]
+      summary: Generate a skill verification quiz using AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateQuizBody"
+      responses:
+        "200":
+          description: Quiz questions generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quiz"
+
+  /verification/quiz/submit:
+    post:
+      operationId: submitQuiz
+      tags: [verification]
+      summary: Submit quiz answers for a skill
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitQuizBody"
+      responses:
+        "200":
+          description: Quiz result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuizResult"
+
+  /verification/upload:
+    post:
+      operationId: uploadVerificationDoc
+      tags: [verification]
+      summary: Upload a verification document (mock)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadDocBody"
+      responses:
+        "200":
+          description: Document uploaded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerificationDoc"
+
+  /verification/status:
+    get:
+      operationId: getVerificationStatus
+      tags: [verification]
+      summary: Get skill verification status for current user
+      responses:
+        "200":
+          description: Verification status per skill
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SkillVerification"
+
 components:
   schemas:
     HealthStatus:
@@ -281,6 +437,8 @@ components:
         email:
           type: string
         avatar:
+          type: string
+        bio:
           type: string
         skillsOffered:
           type: array
@@ -304,6 +462,8 @@ components:
           type: number
         xp:
           type: number
+        onboarded:
+          type: boolean
         monthlyGoals:
           type: array
           items:
@@ -324,8 +484,29 @@ components:
         - totalExchanges
         - streakDays
         - xp
+        - onboarded
         - monthlyGoals
         - skillProgress
+
+    OnboardingBody:
+      type: object
+      properties:
+        name:
+          type: string
+        skillsOffered:
+          type: array
+          items:
+            type: string
+        skillsWanted:
+          type: array
+          items:
+            type: string
+        availability:
+          type: string
+      required:
+        - name
+        - skillsOffered
+        - skillsWanted
 
     MonthlyGoal:
       type: object
@@ -391,6 +572,13 @@ components:
           type: array
           items:
             type: string
+        verificationStatus:
+          type: string
+          enum: [unverified, partial, fully_verified]
+        exchangeCount:
+          type: number
+        isNew:
+          type: boolean
       required:
         - id
         - name
@@ -400,6 +588,9 @@ components:
         - credibilityScore
         - matchScore
         - overlappingSkills
+        - verificationStatus
+        - exchangeCount
+        - isNew
 
     SwipeBody:
       type: object
@@ -713,3 +904,186 @@ components:
         - description
         - userId
         - createdAt
+
+    ChatMessage:
+      type: object
+      properties:
+        id:
+          type: string
+        matchId:
+          type: string
+        senderId:
+          type: string
+        senderName:
+          type: string
+        text:
+          type: string
+        isMine:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - id
+        - matchId
+        - senderId
+        - senderName
+        - text
+        - isMine
+        - createdAt
+
+    SendMessageBody:
+      type: object
+      properties:
+        text:
+          type: string
+      required:
+        - text
+
+    ChatSummary:
+      type: object
+      properties:
+        matchId:
+          type: string
+        partner:
+          $ref: "#/components/schemas/ExploreUser"
+        lastMessage:
+          type: string
+        lastMessageAt:
+          type: string
+        unreadCount:
+          type: number
+      required:
+        - matchId
+        - partner
+        - unreadCount
+
+    GenerateQuizBody:
+      type: object
+      properties:
+        skill:
+          type: string
+      required:
+        - skill
+
+    Quiz:
+      type: object
+      properties:
+        skill:
+          type: string
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuizQuestion"
+      required:
+        - skill
+        - questions
+
+    QuizQuestion:
+      type: object
+      properties:
+        question:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+        correctIndex:
+          type: number
+      required:
+        - question
+        - options
+        - correctIndex
+
+    SubmitQuizBody:
+      type: object
+      properties:
+        skill:
+          type: string
+        answers:
+          type: array
+          items:
+            type: number
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuizQuestion"
+      required:
+        - skill
+        - answers
+        - questions
+
+    QuizResult:
+      type: object
+      properties:
+        passed:
+          type: boolean
+        score:
+          type: number
+        total:
+          type: number
+        skill:
+          type: string
+        message:
+          type: string
+      required:
+        - passed
+        - score
+        - total
+        - skill
+        - message
+
+    UploadDocBody:
+      type: object
+      properties:
+        skill:
+          type: string
+        docName:
+          type: string
+        docType:
+          type: string
+      required:
+        - skill
+        - docName
+        - docType
+
+    VerificationDoc:
+      type: object
+      properties:
+        id:
+          type: string
+        skill:
+          type: string
+        docName:
+          type: string
+        docType:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        uploadedAt:
+          type: string
+      required:
+        - id
+        - skill
+        - docName
+        - docType
+        - status
+        - uploadedAt
+
+    SkillVerification:
+      type: object
+      properties:
+        skill:
+          type: string
+        quizPassed:
+          type: boolean
+        docUploaded:
+          type: boolean
+        status:
+          type: string
+          enum: [unverified, quiz_passed, fully_verified]
+      required:
+        - skill
+        - quizPassed
+        - docUploaded
+        - status

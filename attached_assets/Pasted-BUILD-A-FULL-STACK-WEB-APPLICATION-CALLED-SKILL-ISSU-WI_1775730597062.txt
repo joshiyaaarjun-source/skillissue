@@ -1,0 +1,213 @@
+BUILD A FULL-STACK WEB APPLICATION CALLED "SKILL ISSU" WITH THE FOLLOWING COMPLETE PRODUCT, DESIGN, SYSTEM, MOCK DATA, FIGMA PROTOTYPE, FIREBASE BACKEND, AND AI SPECIFICATIONS.
+
+🧠 CORE PRODUCT CONCEPT
+Create a premium skill-exchange platform where:
+* Users list skills they can teach and skills they want to learn
+* A credit-based system replaces money
+* Users earn credits by teaching and spend credits to learn
+* All exchanges are stored in an immutable ledger
+* The platform must feel premium, trustworthy, and socially engaging
+Tagline: "We swiped right… on skills."
+* Show on login screen
+* Show on discovery header
+* Show on match modal
+
+🔐 AUTHENTICATION & ONBOARDING
+* Firebase Google Sign-In
+* Generate unique user ID on first login
+Onboarding (step-by-step, one per screen):
+1. Name
+2. Skills you can teach
+3. Skills you want to learn
+4. Availability
+* Include progress bar (Rose #BD7880)
+
+👤 USER MODEL
+Each user must store:
+* userId
+* name
+* email
+* profilePhoto
+* skillsOffered[]
+* skillsWanted[]
+* skillsTBR[]
+* creditBalance (default: 20)
+* credibilityScore (default: 0)
+* createdAt
+* verificationStatus per skill
+* badges[]
+* monthlyGoals { target, progress }
+
+🔍 DISCOVERY TAB (WITH MOCK USERS)
+Display 6 swipeable users:
+User Data:
+1. Aisha Khan — UI Design → Wants React — 35 credits — Fully Verified — 🔥
+2. Rohan Iyer — React → Wants UI Design — 28 credits — Fully Verified
+3. Meera Nair — Illustration → Wants Animation — 22 credits — ✨ New User
+4. Arjun Patel — Data Analysis → Wants ML — 40 credits — Fully Verified
+5. Kavya Sharma — Public Speaking → Wants Writing — 18 credits
+6. Daniel Joseph — Copywriting → Wants Marketing — 25 credits
+Each card includes:
+* Photo, name, bio
+* Skills offered/wanted
+* Credibility score
+* Exchange count
+* Verification badge
+* Credit balance
+Swipe Behavior:
+* Right → accept → check mutual → create match
+* Left → reject
+* Prevent duplicate swipes
+
+❤️ MATCHES TAB
+Preload:
+* Aisha Khan ↔ Rohan Iyer
+* Skills: UI Design ↔ React
+Each card:
+* Profile + skill match
+* Buttons:
+    * Start Session
+    * Message
+
+💬 CHAT SYSTEM
+Preload chat:
+* Aisha: "Hey! Want to exchange UI Design for React?"
+* Rohan: "Perfect, I was looking for that!"
+* Aisha: "Let’s do a session this weekend."
+Rules:
+* Only for matched users
+* Real-time Firestore
+UI:
+* Sent → Rose bubble (right)
+* Received → Soft Pink bubble (left)
+
+📊 DASHBOARD
+* Credit balance: 20
+* Transactions: +10 (taught) -5 (learned)
+* Active exchange:
+    * Status: Ongoing
+    * Partner: Rohan
+
+👤 PROFILE + VERIFICATION
+Each skill has: 👉 "Start Verification"
+Flow:
+1. Start quiz
+2. Pass → Upload document
+
+🧠 QUIZ SYSTEM
+Rules:
+* 3 questions
+* Pass if ≥ 2 correct
+* Generated via Claude API
+
+SAMPLE QUIZ — UI DESIGN
+* Wireframing → defines layout ✅
+* Tool → Figma ✅
+* Usability → clear hierarchy ✅
+
+SAMPLE QUIZ — REACT
+* UI components ✅
+* Hooks → state/lifecycle ✅
+* JSX → JavaScript XML ✅
+
+SAMPLE QUIZ — PYTHON
+* Pandas → data manipulation ✅
+* DataFrame → table ✅
+* Matplotlib → visualization ✅
+
+📂 DOCUMENT UPLOAD
+Mock:
+* Aisha → UX Certificate, Figma Portfolio
+* Rohan → React Certificate, GitHub
+
+🔄 EXCHANGE FLOW
+Example:
+* Teach → +10 credits
+* Learn → -5 credits
+
+📜 LEDGER (IMMUTABLE)
+Example:
+* EX123
+* UI Design ↔ React
+* Credits: 10
+* Completed
+
+🔔 NOTIFICATIONS
+Trigger:
+* Match → modal
+* Message → toast
+* Credits → toast
+
+🎨 UI / UX SYSTEM (STRICT)
+Colors:
+* Pine #102B1F (background)
+* Rose #BD7880 (primary)
+* Wine #4D0011 (accent)
+* Soft Pink #FFD9D9 (text)
+Typography:
+* Wordmark: Times New Roman (uppercase, spaced)
+* Body: Inter / DM Sans
+Style:
+* Minimal, spacious
+* Card-based
+* Radius: 10px
+
+🎨 FIGMA PROTOTYPE STRUCTURE
+Frames (iPhone 14):
+1. Login → Google Sign-In
+2. Onboarding (4 steps)
+3. Discovery (swipe cards)
+4. Match Modal
+5. Matches
+6. Chat
+7. Dashboard
+8. Profile
+9. Quiz
+10. Upload
+Flow: Login → Onboarding → Discovery → Match → Chat → Profile → Quiz → Upload
+
+🔥 FIREBASE SCHEMA
+Collections:
+/users
+User profile data
+/swipes
+Swipe tracking
+/matches
+Matched users
+/chats + /messages
+Realtime chat
+/exchanges
+Skill exchanges
+/credits
+Transactions
+/ledger
+Immutable records
+/documents
+User uploads
+
+🧠 CLAUDE API PROMPTS
+SYSTEM:
+"You are an expert educator. Generate practical skill quizzes."
+GENERATION PROMPT:
+Generate 3 MCQs for {skill}
+Format: { "questions": [ { "question": "", "options": ["", "", ""], "correctIndex": 0 } ] }
+Rules:
+* 3 questions
+* 3 options each
+* 1 correct answer
+* Practical, not theoretical
+
+EVALUATION:
+* ≥ 2 correct → PASS
+* else → FAIL
+
+RETRY:
+Regenerate new questions if failed
+
+🔗 FULL SYSTEM FLOW
+Login → Onboarding → Discovery → Swipe → Match → Chat → Verification → Exchange → Credits → Ledger
+
+🚀 FINAL OUTPUT REQUIREMENT
+The app must: ✔ Start at login ✔ Show swipeable mock users ✔ Create matches dynamically ✔ Enable chat ✔ Allow verification via quiz ✔ Support document upload ✔ Track credits ✔ Maintain immutable ledger ✔ Follow STRICT UI/UX
+
+END OF MASTER PROMPT

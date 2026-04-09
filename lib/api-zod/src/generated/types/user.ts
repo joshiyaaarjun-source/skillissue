@@ -13,6 +13,7 @@ export interface User {
   name: string;
   email: string;
   avatar?: string;
+  bio?: string;
   skillsOffered: string[];
   skillsWanted: string[];
   skillTBR: string[];
@@ -21,6 +22,7 @@ export interface User {
   totalExchanges: number;
   streakDays: number;
   xp: number;
+  onboarded: boolean;
   monthlyGoals: MonthlyGoal[];
   skillProgress: SkillProgress[];
 }

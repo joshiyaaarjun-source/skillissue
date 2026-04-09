@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Compass, HeartHandshake, Trophy, BarChart } from "lucide-react";
+import { Home, Compass, HeartHandshake, Trophy, BarChart, User, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function BottomNav() {
@@ -11,8 +11,8 @@ export default function BottomNav() {
     { href: "/dashboard", icon: Home, label: "Home" },
     { href: "/explore", icon: Compass, label: "Explore" },
     { href: "/matches", icon: HeartHandshake, label: "Matches" },
-    { href: "/gamification", icon: Trophy, label: "Trophy" },
-    { href: "/analytics", icon: BarChart, label: "Stats" },
+    { href: "/chat", icon: MessageCircle, label: "Chat" },
+    { href: "/profile", icon: User, label: "Profile" },
   ];
 
   return (

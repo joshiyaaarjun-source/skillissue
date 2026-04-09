@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db, usersTable, monthlyGoalsTable, skillProgressTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
-import { GetUserParams, GetMeResponse, GetUserResponse } from "@workspace/api-zod";
+import { eq, ne } from "drizzle-orm";
+import { GetUserParams, GetMeResponse, GetUserResponse, GetExploreUsersResponse } from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
@@ -13,6 +13,7 @@ function formatUser(user: typeof usersTable.$inferSelect, goals: typeof monthlyG
     name: user.name,
     email: user.email,
     avatar: user.avatar,
+    bio: user.bio || "",
     skillsOffered: user.skillsOffered,
     skillsWanted: user.skillsWanted,
     skillTBR: user.skillTBR,
@@ -21,6 +22,7 @@ function formatUser(user: typeof usersTable.$inferSelect, goals: typeof monthlyG
     totalExchanges: user.totalExchanges,
     streakDays: user.streakDays,
     xp: user.xp,
+    onboarded: user.onboarded ?? false,
     monthlyGoals: goals.map(g => ({
       id: String(g.id),
       title: g.title,
@@ -48,17 +50,15 @@ router.get("/users/me", async (req, res): Promise<void> => {
 });
 
 router.get("/users/explore", async (req, res): Promise<void> => {
-  const currentUser = await db.select().from(usersTable).where(eq(usersTable.id, DEMO_USER_ID));
-  if (!currentUser[0]) {
+  const [currentUser] = await db.select().from(usersTable).where(eq(usersTable.id, DEMO_USER_ID));
+  if (!currentUser) {
     res.json([]);
     return;
   }
-  const mySkillsOffered = currentUser[0].skillsOffered;
-  const mySkillsWanted = currentUser[0].skillsWanted;
+  const mySkillsOffered = currentUser.skillsOffered;
+  const mySkillsWanted = currentUser.skillsWanted;
 
-  const allUsers = await db.select().from(usersTable).where(eq(usersTable.id, DEMO_USER_ID));
-  const allUsersExcludeMe = await db.select().from(usersTable);
-  const others = allUsersExcludeMe.filter(u => u.id !== DEMO_USER_ID);
+  const others = await db.select().from(usersTable).where(ne(usersTable.id, DEMO_USER_ID));
 
   const exploreUsers = others.map(u => {
     const overlapping = [
@@ -66,23 +66,26 @@ router.get("/users/explore", async (req, res): Promise<void> => {
       ...mySkillsOffered.filter(s => u.skillsWanted.includes(s)),
     ].filter((v, i, a) => a.indexOf(v) === i);
 
-    const matchScore = Math.min(100, overlapping.length * 20 + Math.random() * 40);
+    const matchScore = Math.min(100, overlapping.length * 20 + 40);
 
     return {
       id: String(u.id),
       name: u.name,
       avatar: u.avatar,
-      bio: u.bio,
+      bio: u.bio || "",
       skillsOffered: u.skillsOffered,
       skillsWanted: u.skillsWanted,
       credits: u.creditBalance,
       credibilityScore: u.credibilityScore,
       matchScore: Math.round(matchScore),
       overlappingSkills: overlapping,
+      verificationStatus: (u.verificationStatus as "unverified" | "partial" | "fully_verified") || "unverified",
+      exchangeCount: u.exchangeCount || 0,
+      isNew: u.isNew || false,
     };
   });
 
-  res.json(exploreUsers);
+  res.json(GetExploreUsersResponse.parse(exploreUsers));
 });
 
 router.get("/users/:userId", async (req, res): Promise<void> => {

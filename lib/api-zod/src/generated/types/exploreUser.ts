@@ -5,6 +5,7 @@
  * Skillissu - Peer-to-peer skill exchange platform API
  * OpenAPI spec version: 0.1.0
  */
+import type { ExploreUserVerificationStatus } from "./exploreUserVerificationStatus";
 
 export interface ExploreUser {
   id: string;
@@ -17,4 +18,7 @@ export interface ExploreUser {
   bio?: string;
   matchScore: number;
   overlappingSkills: string[];
+  verificationStatus: ExploreUserVerificationStatus;
+  exchangeCount: number;
+  isNew: boolean;
 }

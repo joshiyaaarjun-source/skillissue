@@ -125,11 +125,28 @@ export default function Explore() {
               {currentUser.credibilityScore.toFixed(1)}
             </div>
             
-            <Avatar className="h-28 w-28 border-4 border-background shadow-lg mb-4">
-              <AvatarImage src={currentUser.avatar} />
-              <AvatarFallback className="text-3xl font-bold bg-primary text-primary-foreground">{currentUser.name.charAt(0)}</AvatarFallback>
-            </Avatar>
+            <div className="flex flex-col items-center gap-1 mb-4">
+              <Avatar className="h-28 w-28 border-4 border-background shadow-lg">
+                <AvatarImage src={currentUser.avatar} />
+                <AvatarFallback className="text-3xl font-bold bg-primary text-primary-foreground">{currentUser.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-wrap justify-center gap-2 mt-2">
+                {currentUser.verificationStatus === "fully_verified" && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 bg-green-100 text-green-800 rounded-full border border-green-200">
+                    Fully Verified
+                  </span>
+                )}
+                {currentUser.isNew && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 bg-[#ffd9d9] text-[#bd7880] rounded-full border border-[#bd7880]/30">
+                    New User
+                  </span>
+                )}
+              </div>
+            </div>
             <h2 className="text-2xl font-bold">{currentUser.name}</h2>
+            <p className="text-xs text-muted-foreground font-medium mt-1">
+              {currentUser.exchangeCount} exchanges completed
+            </p>
             {currentUser.bio && (
               <p className="text-sm text-muted-foreground text-center mt-2 max-w-[80%] leading-snug">
                 {currentUser.bio}
@@ -213,9 +230,17 @@ export default function Explore() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="text-xl text-white font-medium mb-12"
+              className="text-xl text-white font-medium mb-2"
             >
               ...but for skills.
+            </motion.p>
+            <motion.p
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-sm text-[#ffd9d9]/80 font-serif italic mb-10"
+            >
+              We swiped right... on skills.
             </motion.p>
             
             <motion.div 

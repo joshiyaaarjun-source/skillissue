@@ -37,6 +37,7 @@ export interface User {
   name: string;
   email: string;
   avatar?: string;
+  bio?: string;
   skillsOffered: string[];
   skillsWanted: string[];
   skillTBR: string[];
@@ -45,9 +46,26 @@ export interface User {
   totalExchanges: number;
   streakDays: number;
   xp: number;
+  onboarded: boolean;
   monthlyGoals: MonthlyGoal[];
   skillProgress: SkillProgress[];
 }
+
+export interface OnboardingBody {
+  name: string;
+  skillsOffered: string[];
+  skillsWanted: string[];
+  availability?: string;
+}
+
+export type ExploreUserVerificationStatus =
+  (typeof ExploreUserVerificationStatus)[keyof typeof ExploreUserVerificationStatus];
+
+export const ExploreUserVerificationStatus = {
+  unverified: "unverified",
+  partial: "partial",
+  fully_verified: "fully_verified",
+} as const;
 
 export interface ExploreUser {
   id: string;
@@ -60,6 +78,9 @@ export interface ExploreUser {
   bio?: string;
   matchScore: number;
   overlappingSkills: string[];
+  verificationStatus: ExploreUserVerificationStatus;
+  exchangeCount: number;
+  isNew: boolean;
 }
 
 export type SwipeBodyDirection =
@@ -262,4 +283,95 @@ export interface LedgerEntry {
   userId: string;
   metadata?: LedgerEntryMetadata;
   createdAt: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  matchId: string;
+  senderId: string;
+  senderName: string;
+  text: string;
+  isMine: boolean;
+  createdAt: string;
+}
+
+export interface SendMessageBody {
+  text: string;
+}
+
+export interface ChatSummary {
+  matchId: string;
+  partner: ExploreUser;
+  lastMessage?: string;
+  lastMessageAt?: string;
+  unreadCount: number;
+}
+
+export interface GenerateQuizBody {
+  skill: string;
+}
+
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  correctIndex: number;
+}
+
+export interface Quiz {
+  skill: string;
+  questions: QuizQuestion[];
+}
+
+export interface SubmitQuizBody {
+  skill: string;
+  answers: number[];
+  questions: QuizQuestion[];
+}
+
+export interface QuizResult {
+  passed: boolean;
+  score: number;
+  total: number;
+  skill: string;
+  message: string;
+}
+
+export interface UploadDocBody {
+  skill: string;
+  docName: string;
+  docType: string;
+}
+
+export type VerificationDocStatus =
+  (typeof VerificationDocStatus)[keyof typeof VerificationDocStatus];
+
+export const VerificationDocStatus = {
+  pending: "pending",
+  approved: "approved",
+  rejected: "rejected",
+} as const;
+
+export interface VerificationDoc {
+  id: string;
+  skill: string;
+  docName: string;
+  docType: string;
+  status: VerificationDocStatus;
+  uploadedAt: string;
+}
+
+export type SkillVerificationStatus =
+  (typeof SkillVerificationStatus)[keyof typeof SkillVerificationStatus];
+
+export const SkillVerificationStatus = {
+  unverified: "unverified",
+  quiz_passed: "quiz_passed",
+  fully_verified: "fully_verified",
+} as const;
+
+export interface SkillVerification {
+  skill: string;
+  quizPassed: boolean;
+  docUploaded: boolean;
+  status: SkillVerificationStatus;
 }
