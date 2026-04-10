@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { useCreateExchange, useGetMe } from "@workspace/api-client-react";
 import { getGetMeQueryKey } from "@workspace/api-client-react";
-import type { ExploreUser } from "@workspace/api-client-react/src/generated/api.schemas";
+import type { ExploreUser } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";

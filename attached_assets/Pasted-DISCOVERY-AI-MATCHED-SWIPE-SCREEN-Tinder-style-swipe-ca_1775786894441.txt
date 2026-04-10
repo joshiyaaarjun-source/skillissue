@@ -1,0 +1,51 @@
+DISCOVERY — AI-MATCHED SWIPE SCREEN
+
+Tinder-style swipe cards. Pre-qualification: mutual skill compatibility + no prior interaction.
+
+**AI Match Ranking:** skill compatibility, ratings, verification level, domain alignment, experience balance.
+
+**Each card displays:**
+1. Profile photo — top half, dark gradient fade at bottom
+2. Name — bold serif, large, overlaid on gradient
+3. Short bio — italic, ivory
+4. Skill chips — Teaching: blush rose filled, Wants: ivory outlined
+5. Credibility score, exchange count, verification badge
+6. Contextual chips: "High Demand Skill", "New User" (if account < 7 days)
+
+**Tapping a skill chip on a card** shows tooltip: domain, specialization, experience, badges.
+
+**Three action buttons:**
+- ✕ Reject — outlined circle, muted red tint on press
+- ⓘ Info — opens Profile Preview Sheet WITHOUT triggering a swipe
+- ♥ Like — outlined circle, blush rose tint on press
+
+**Profile Preview Sheet (ⓘ):** slide-up full-screen modal — full profile, Skill Intelligence View per skill, "Pass" and "Like ♥" (blush rose fill) at bottom. Close returns to same card.
+
+**Empty state:** *"No new skill crushes right now — check back soon."* small italic ivory.
+
+---
+
+## ❤️ 7. MATCH SYSTEM — STRICT LOGIC
+
+Match created only when: backend confirms mutual skill compatibility AND both users independently swipe right.
+
+**Match Modal — full screen:**
+- Dark overlay, blush rose border
+- Both profile photos side by side
+- Gold-to-rose particle burst animation
+- *"You and [Name] are a match! They can teach you [Skill A] and you can teach them [Skill B]."*
+- Subtext: *"We swiped right… on skills."*
+- CTA: **"Start Session"** (blush rose fill)
+- Secondary: **"Keep Swiping"**
+
+---
+
+## 🤝 7.5. MATCHES PAGE
+
+**Top summary metrics:** total matches, total credits earned, total credits spent.
+
+**Active match cards:** profile photo + name, matched skill pair, match date, status chip, "Message" and "Propose Exchange" buttons.
+
+**Past matches:** name + photo, skills exchanged, credits given/received, last active date, last learned/taught timestamps.
+
+---
