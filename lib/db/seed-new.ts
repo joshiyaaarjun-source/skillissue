@@ -245,9 +245,9 @@ async function seed() {
   // 6. Monthly goals for Alex
   await db.delete(monthlyGoalsTable).where(eq(monthlyGoalsTable.userId, 1));
   await db.insert(monthlyGoalsTable).values([
-    { userId: 1, title: "Complete 3 React sessions", progress: 2, target: 3 },
-    { userId: 1, title: "Earn 50 credits", progress: 35, target: 50 },
-    { userId: 1, title: "Learn Figma basics", progress: 1, target: 4 },
+    { userId: 1, title: "Complete 3 React sessions", progress: 2, target: 3, month: "2026-04" },
+    { userId: 1, title: "Earn 50 credits", progress: 35, target: 50, month: "2026-04" },
+    { userId: 1, title: "Learn Figma basics", progress: 1, target: 4, month: "2026-04" },
   ]);
 
   // 7. Skill progress for Alex
@@ -263,11 +263,11 @@ async function seed() {
   // 8. Badges for Alex
   await db.delete(badgesTable).where(eq(badgesTable.userId, 1));
   await db.insert(badgesTable).values([
-    { userId: 1, name: "First Exchange", description: "Completed your first skill exchange", icon: "star", earned: true, xpGained: 100 },
-    { userId: 1, name: "Streak Starter", description: "Maintained a 7-day streak", icon: "flame", earned: true, xpGained: 200 },
-    { userId: 1, name: "Verified Teacher", description: "Passed a skill verification quiz", icon: "award", earned: true, xpGained: 300 },
-    { userId: 1, name: "Social Butterfly", description: "Matched with 5 people", icon: "users", earned: false, xpGained: 0 },
-    { userId: 1, name: "Skill Master", description: "Complete 10 exchanges", icon: "trophy", earned: false, xpGained: 0 },
+    { userId: 1, badgeId: "first_exchange", name: "First Exchange", description: "Completed your first skill exchange", icon: "star", earned: true, progress: 1, target: 1 },
+    { userId: 1, badgeId: "streak_starter", name: "Streak Starter", description: "Maintained a 7-day streak", icon: "flame", earned: true, progress: 7, target: 7 },
+    { userId: 1, badgeId: "verified_teacher", name: "Verified Teacher", description: "Passed a skill verification quiz", icon: "award", earned: true, progress: 1, target: 1 },
+    { userId: 1, badgeId: "social_butterfly", name: "Social Butterfly", description: "Matched with 5 people", icon: "users", earned: false, progress: 2, target: 5 },
+    { userId: 1, badgeId: "skill_master", name: "Skill Master", description: "Complete 10 exchanges", icon: "trophy", earned: false, progress: 3, target: 10 },
   ]);
 
   // 9. Active exchange between Alex and Aisha

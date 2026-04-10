@@ -1,8 +1,7 @@
 import { Router, type IRouter } from "express";
-import { db, usersTable } from "@workspace/db";
+import { db, usersTable, monthlyGoalsTable, skillProgressTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { CompleteOnboardingBody, GetMeResponse } from "@workspace/api-zod";
-import { monthlyGoalsTable, skillProgressTable } from "@workspace/db";
 
 const router: IRouter = Router();
 const DEMO_USER_ID = 1;
@@ -14,13 +13,16 @@ router.post("/onboarding/complete", async (req, res): Promise<void> => {
     return;
   }
 
-  const { name, skillsOffered, skillsWanted, availability } = body.data;
+  const { name, bio, skillsOffered, skillsWanted, availability, domains, linkedIn } = body.data;
 
   await db.update(usersTable).set({
-    name: name || undefined,
-    skillsOffered: skillsOffered.length > 0 ? skillsOffered : undefined,
-    skillsWanted: skillsWanted.length > 0 ? skillsWanted : undefined,
+    ...(name ? { name } : {}),
+    ...(bio ? { bio } : {}),
+    ...(skillsOffered.length > 0 ? { skillsOffered } : {}),
+    ...(skillsWanted.length > 0 ? { skillsWanted } : {}),
     availability: availability || "Flexible",
+    ...(domains && domains.length > 0 ? { domains } : {}),
+    ...(linkedIn ? { linkedIn } : {}),
     onboarded: true,
   }).where(eq(usersTable.id, DEMO_USER_ID));
 

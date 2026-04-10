@@ -23,6 +23,8 @@ export const usersTable = pgTable("users", {
   verificationStatus: text("verification_status").notNull().default("unverified"),
   exchangeCount: integer("exchange_count").notNull().default(0),
   isNew: boolean("is_new").notNull().default(false),
+  domains: text("domains").array().notNull().default([]),
+  linkedIn: text("linked_in").notNull().default(""),
   lastActiveAt: timestamp("last_active_at", { withTimezone: true }).notNull().defaultNow(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),

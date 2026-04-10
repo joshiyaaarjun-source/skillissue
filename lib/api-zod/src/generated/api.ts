@@ -115,9 +115,12 @@ export const GetExploreUsersResponse = zod.array(GetExploreUsersResponseItem);
  */
 export const CompleteOnboardingBody = zod.object({
   name: zod.string(),
+  bio: zod.string().optional(),
   skillsOffered: zod.array(zod.string()),
   skillsWanted: zod.array(zod.string()),
   availability: zod.string().optional(),
+  domains: zod.array(zod.string()).optional(),
+  linkedIn: zod.string().optional(),
 });
 
 export const CompleteOnboardingResponse = zod.object({

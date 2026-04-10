@@ -53,9 +53,12 @@ export interface User {
 
 export interface OnboardingBody {
   name: string;
+  bio?: string;
   skillsOffered: string[];
   skillsWanted: string[];
   availability?: string;
+  domains?: string[];
+  linkedIn?: string;
 }
 
 export type ExploreUserVerificationStatus =

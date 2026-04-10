@@ -493,6 +493,8 @@ components:
       properties:
         name:
           type: string
+        bio:
+          type: string
         skillsOffered:
           type: array
           items:
@@ -502,6 +504,12 @@ components:
           items:
             type: string
         availability:
+          type: string
+        domains:
+          type: array
+          items:
+            type: string
+        linkedIn:
           type: string
       required:
         - name
