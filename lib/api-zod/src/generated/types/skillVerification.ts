@@ -11,5 +11,5 @@ export interface SkillVerification {
   skill: string;
   quizPassed: boolean;
   docUploaded: boolean;
-  status: SkillVerificationStatus;
+  status?: SkillVerificationStatus;
 }

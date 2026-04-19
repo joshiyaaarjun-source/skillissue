@@ -36,6 +36,8 @@ tags:
     description: Chat system
   - name: verification
     description: Skill verification via quiz and documents
+  - name: ai
+    description: AI-powered coaching and learning paths
 
 paths:
   /healthz:
@@ -344,6 +346,75 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ChatSummary"
+
+  /ai/skill-coach:
+    get:
+      operationId: getSkillCoach
+      tags: [ai]
+      summary: Get AI skill coach feedback based on recent exchanges
+      responses:
+        "200":
+          description: Skill coach feedback
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillCoachFeedback"
+
+  /ai/learning-paths:
+    get:
+      operationId: getLearningPaths
+      tags: [ai]
+      summary: Get all learning paths for current user
+      responses:
+        "200":
+          description: List of learning paths
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LearningPath"
+    post:
+      operationId: generateLearningPath
+      tags: [ai]
+      summary: Generate a new AI learning path for a goal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateLearningPathBody"
+      responses:
+        "200":
+          description: Generated learning path
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LearningPath"
+
+  /ai/learning-paths/{pathId}/steps/{stepId}/complete:
+    post:
+      operationId: completeLearningStep
+      tags: [ai]
+      summary: Mark a learning path step as complete
+      parameters:
+        - name: pathId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: stepId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated learning path
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LearningPath"
 
   /verification/quiz:
     post:
@@ -1094,4 +1165,91 @@ components:
         - skill
         - quizPassed
         - docUploaded
+
+    SkillCoachFeedback:
+      type: object
+      properties:
+        strengths:
+          type: array
+          items:
+            type: string
+        weaknesses:
+          type: array
+          items:
+            type: string
+        suggestions:
+          type: array
+          items:
+            type: string
+        coachNote:
+          type: string
+        generatedAt:
+          type: string
+      required:
+        - strengths
+        - weaknesses
+        - suggestions
+        - coachNote
+        - generatedAt
+
+    GenerateLearningPathBody:
+      type: object
+      properties:
+        goal:
+          type: string
+      required:
+        - goal
+
+    LearningPathStep:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        xp:
+          type: number
+        status:
+          type: string
+          enum: [locked, available, completed]
+        order:
+          type: number
+        resources:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - title
+        - description
+        - xp
         - status
+        - order
+        - resources
+
+    LearningPath:
+      type: object
+      properties:
+        id:
+          type: string
+        goal:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/LearningPathStep"
+        createdAt:
+          type: string
+        totalXp:
+          type: number
+        completedSteps:
+          type: number
+      required:
+        - id
+        - goal
+        - steps
+        - createdAt
+        - totalXp
+        - completedSteps

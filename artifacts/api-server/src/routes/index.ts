@@ -13,6 +13,7 @@ import ledgerRouter from "./ledger";
 import chatRouter from "./chat";
 import verificationRouter from "./verification";
 import onboardingRouter from "./onboarding";
+import aiRouter from "./ai";
 
 const router: IRouter = Router();
 
@@ -30,5 +31,6 @@ router.use(ledgerRouter);
 router.use(chatRouter);
 router.use(verificationRouter);
 router.use(onboardingRouter);
+router.use(aiRouter);
 
 export default router;

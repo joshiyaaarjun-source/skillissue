@@ -9,3 +9,4 @@ export * from "./monthly_goals";
 export * from "./skill_progress";
 export * from "./messages";
 export * from "./verifications";
+export * from "./learning_paths";

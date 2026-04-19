@@ -16,6 +16,7 @@ import ChatList from "@/pages/ChatList";
 import Chat from "@/pages/Chat";
 import Quiz from "@/pages/Quiz";
 import Upload from "@/pages/Upload";
+import LearningPaths from "@/pages/LearningPaths";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/chat/:matchId" component={Chat} />
       <Route path="/quiz" component={Quiz} />
       <Route path="/upload" component={Upload} />
+      <Route path="/learning-paths" component={LearningPaths} />
       <Route component={NotFound} />
     </Switch>
   );

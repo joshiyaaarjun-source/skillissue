@@ -376,5 +376,45 @@ export interface SkillVerification {
   skill: string;
   quizPassed: boolean;
   docUploaded: boolean;
-  status: SkillVerificationStatus;
+  status?: SkillVerificationStatus;
+}
+
+export interface SkillCoachFeedback {
+  strengths: string[];
+  weaknesses: string[];
+  suggestions: string[];
+  coachNote: string;
+  generatedAt: string;
+}
+
+export interface GenerateLearningPathBody {
+  goal: string;
+}
+
+export type LearningPathStepStatus =
+  (typeof LearningPathStepStatus)[keyof typeof LearningPathStepStatus];
+
+export const LearningPathStepStatus = {
+  locked: "locked",
+  available: "available",
+  completed: "completed",
+} as const;
+
+export interface LearningPathStep {
+  id: string;
+  title: string;
+  description: string;
+  xp: number;
+  status: LearningPathStepStatus;
+  order: number;
+  resources: string[];
+}
+
+export interface LearningPath {
+  id: string;
+  goal: string;
+  steps: LearningPathStep[];
+  createdAt: string;
+  totalXp: number;
+  completedSteps: number;
 }

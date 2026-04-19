@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Star, Flame, Zap, ArrowRight, BookOpen, User as UserIcon } from "lucide-react";
-import { useGetMe, getGetMeQueryKey, useGetNudges, getGetNudgesQueryKey, useGetExchanges, getGetExchangesQueryKey } from "@workspace/api-client-react";
+import { Star, Flame, Zap, ArrowRight, BookOpen, User as UserIcon, Brain, ChevronDown, ChevronUp, CheckCircle2, Lightbulb, AlertCircle, RefreshCw, Map } from "lucide-react";
+import { useGetMe, getGetMeQueryKey, useGetNudges, getGetNudgesQueryKey, useGetExchanges, getGetExchangesQueryKey, useGetSkillCoach, getGetSkillCoachQueryKey } from "@workspace/api-client-react";
+import { Link } from "wouter";
 import BottomNav from "@/components/BottomNav";
 import FakeNotificationBanner from "@/components/FakeNotificationBanner";
 import CreditCounter from "@/components/CreditCounter";
@@ -12,6 +13,8 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -30,6 +33,9 @@ export default function Dashboard() {
   const { data: me, isLoading: meLoading } = useGetMe({ query: { queryKey: getGetMeQueryKey() } });
   const { data: nudges, isLoading: nudgesLoading } = useGetNudges({ query: { queryKey: getGetNudgesQueryKey() } });
   const { data: exchanges, isLoading: exchangesLoading } = useGetExchanges({ query: { queryKey: getGetExchangesQueryKey() } });
+  const { data: coach, isLoading: coachLoading, refetch: refetchCoach } = useGetSkillCoach({ query: { queryKey: getGetSkillCoachQueryKey() } });
+  const [coachExpanded, setCoachExpanded] = useState(false);
+  const queryClient = useQueryClient();
 
   if (meLoading || nudgesLoading || exchangesLoading) {
     return (
@@ -109,6 +115,108 @@ export default function Dashboard() {
             ))}
           </motion.div>
         )}
+
+        {/* AI Skill Coach */}
+        <motion.div variants={itemVariants}>
+          <Card className="border border-[#bd7880]/20 shadow-sm overflow-hidden bg-gradient-to-br from-[#4d0011]/5 via-white to-[#ffd9d9]/10">
+            <CardHeader className="pb-3 pt-4 px-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-bold flex items-center gap-2 text-[#4d0011]">
+                  <div className="w-7 h-7 bg-[#4d0011] rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Brain className="h-4 w-4 text-[#ffd9d9]" />
+                  </div>
+                  Your Skill Coach says…
+                </CardTitle>
+                <button
+                  onClick={() => { queryClient.invalidateQueries({ queryKey: getGetSkillCoachQueryKey() }); }}
+                  className="text-muted-foreground hover:text-[#4d0011] transition-colors p-1 rounded-full hover:bg-muted"
+                  title="Refresh"
+                >
+                  <RefreshCw size={14} className={coachLoading ? "animate-spin" : ""} />
+                </button>
+              </div>
+            </CardHeader>
+            <CardContent className="px-4 pb-4 space-y-3">
+              {coachLoading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-5/6" />
+                </div>
+              ) : coach ? (
+                <>
+                  {/* Coach note */}
+                  <p className="text-sm italic text-[#4d0011]/80 leading-relaxed border-l-2 border-[#bd7880] pl-3">
+                    "{coach.coachNote}"
+                  </p>
+
+                  {/* Strengths preview */}
+                  <div className="space-y-1.5">
+                    {(coachExpanded ? coach.strengths : coach.strengths.slice(0, 2)).map((s, i) => (
+                      <div key={i} className="flex items-start gap-2 text-xs">
+                        <CheckCircle2 size={13} className="text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground/80">{s}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Expand/collapse */}
+                  {coachExpanded && (
+                    <div className="space-y-3 pt-1">
+                      {coach.weaknesses.length > 0 && (
+                        <div className="space-y-1.5">
+                          <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Areas to grow</p>
+                          {coach.weaknesses.map((w, i) => (
+                            <div key={i} className="flex items-start gap-2 text-xs">
+                              <AlertCircle size={13} className="text-amber-500 flex-shrink-0 mt-0.5" />
+                              <span className="text-foreground/80">{w}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {coach.suggestions.length > 0 && (
+                        <div className="space-y-1.5">
+                          <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Suggested actions</p>
+                          {coach.suggestions.map((s, i) => (
+                            <div key={i} className="flex items-start gap-2 text-xs">
+                              <Lightbulb size={13} className="text-[#bd7880] flex-shrink-0 mt-0.5" />
+                              <span className="text-foreground/80">{s}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => setCoachExpanded(p => !p)}
+                    className="flex items-center gap-1 text-[10px] font-bold text-[#bd7880] hover:text-[#4d0011] transition-colors"
+                  >
+                    {coachExpanded ? <><ChevronUp size={12} /> Show less</> : <><ChevronDown size={12} /> Full analysis</>}
+                  </button>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground italic">Coach feedback loading…</p>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Learning Paths CTA */}
+        <motion.div variants={itemVariants}>
+          <Link href="/learning-paths">
+            <div className="bg-[#4d0011] text-white rounded-2xl p-4 flex items-center gap-4 shadow-md hover:bg-[#4d0011]/90 transition-colors cursor-pointer">
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Map className="h-6 w-6 text-[#ffd9d9]" />
+              </div>
+              <div className="flex-1">
+                <p className="font-bold text-base text-white leading-none">AI Learning Paths</p>
+                <p className="text-xs text-[#ffd9d9]/70 mt-1 italic">Tell us your goal. We'll build the roadmap.</p>
+              </div>
+              <ArrowRight className="h-5 w-5 text-[#ffd9d9]/60" />
+            </div>
+          </Link>
+        </motion.div>
 
         {/* Gamification Strip */}
         <motion.div variants={itemVariants} className="bg-card rounded-2xl p-4 shadow-sm border border-border flex items-center justify-between">

@@ -465,6 +465,93 @@ export const GetChatListResponseItem = zod.object({
 export const GetChatListResponse = zod.array(GetChatListResponseItem);
 
 /**
+ * @summary Get AI skill coach feedback based on recent exchanges
+ */
+export const GetSkillCoachResponse = zod.object({
+  strengths: zod.array(zod.string()),
+  weaknesses: zod.array(zod.string()),
+  suggestions: zod.array(zod.string()),
+  coachNote: zod.string(),
+  generatedAt: zod.string(),
+});
+
+/**
+ * @summary Get all learning paths for current user
+ */
+export const GetLearningPathsResponseItem = zod.object({
+  id: zod.string(),
+  goal: zod.string(),
+  steps: zod.array(
+    zod.object({
+      id: zod.string(),
+      title: zod.string(),
+      description: zod.string(),
+      xp: zod.number(),
+      status: zod.enum(["locked", "available", "completed"]),
+      order: zod.number(),
+      resources: zod.array(zod.string()),
+    }),
+  ),
+  createdAt: zod.string(),
+  totalXp: zod.number(),
+  completedSteps: zod.number(),
+});
+export const GetLearningPathsResponse = zod.array(GetLearningPathsResponseItem);
+
+/**
+ * @summary Generate a new AI learning path for a goal
+ */
+export const GenerateLearningPathBody = zod.object({
+  goal: zod.string(),
+});
+
+export const GenerateLearningPathResponse = zod.object({
+  id: zod.string(),
+  goal: zod.string(),
+  steps: zod.array(
+    zod.object({
+      id: zod.string(),
+      title: zod.string(),
+      description: zod.string(),
+      xp: zod.number(),
+      status: zod.enum(["locked", "available", "completed"]),
+      order: zod.number(),
+      resources: zod.array(zod.string()),
+    }),
+  ),
+  createdAt: zod.string(),
+  totalXp: zod.number(),
+  completedSteps: zod.number(),
+});
+
+/**
+ * @summary Mark a learning path step as complete
+ */
+export const CompleteLearningStepParams = zod.object({
+  pathId: zod.coerce.string(),
+  stepId: zod.coerce.string(),
+});
+
+export const CompleteLearningStepResponse = zod.object({
+  id: zod.string(),
+  goal: zod.string(),
+  steps: zod.array(
+    zod.object({
+      id: zod.string(),
+      title: zod.string(),
+      description: zod.string(),
+      xp: zod.number(),
+      status: zod.enum(["locked", "available", "completed"]),
+      order: zod.number(),
+      resources: zod.array(zod.string()),
+    }),
+  ),
+  createdAt: zod.string(),
+  totalXp: zod.number(),
+  completedSteps: zod.number(),
+});
+
+/**
  * @summary Generate a skill verification quiz using AI
  */
 export const GenerateQuizBody = zod.object({
@@ -530,7 +617,7 @@ export const GetVerificationStatusResponseItem = zod.object({
   skill: zod.string(),
   quizPassed: zod.boolean(),
   docUploaded: zod.boolean(),
-  status: zod.enum(["unverified", "quiz_passed", "fully_verified"]),
+  status: zod.enum(["unverified", "quiz_passed", "fully_verified"]).optional(),
 });
 export const GetVerificationStatusResponse = zod.array(
   GetVerificationStatusResponseItem,

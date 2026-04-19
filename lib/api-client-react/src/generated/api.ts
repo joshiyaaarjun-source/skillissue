@@ -24,8 +24,10 @@ import type {
   Exchange,
   ExploreUser,
   GamificationData,
+  GenerateLearningPathBody,
   GenerateQuizBody,
   HealthStatus,
+  LearningPath,
   LedgerEntry,
   Match,
   Notification,
@@ -34,6 +36,7 @@ import type {
   Quiz,
   QuizResult,
   SendMessageBody,
+  SkillCoachFeedback,
   SkillVerification,
   SubmitQuizBody,
   SwipeBody,
@@ -1514,6 +1517,328 @@ export function useGetChatList<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * @summary Get AI skill coach feedback based on recent exchanges
+ */
+export const getGetSkillCoachUrl = () => {
+  return `/api/ai/skill-coach`;
+};
+
+export const getSkillCoach = async (
+  options?: RequestInit,
+): Promise<SkillCoachFeedback> => {
+  return customFetch<SkillCoachFeedback>(getGetSkillCoachUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetSkillCoachQueryKey = () => {
+  return [`/api/ai/skill-coach`] as const;
+};
+
+export const getGetSkillCoachQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSkillCoach>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getSkillCoach>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetSkillCoachQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSkillCoach>>> = ({
+    signal,
+  }) => getSkillCoach({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSkillCoach>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetSkillCoachQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSkillCoach>>
+>;
+export type GetSkillCoachQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get AI skill coach feedback based on recent exchanges
+ */
+
+export function useGetSkillCoach<
+  TData = Awaited<ReturnType<typeof getSkillCoach>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getSkillCoach>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetSkillCoachQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get all learning paths for current user
+ */
+export const getGetLearningPathsUrl = () => {
+  return `/api/ai/learning-paths`;
+};
+
+export const getLearningPaths = async (
+  options?: RequestInit,
+): Promise<LearningPath[]> => {
+  return customFetch<LearningPath[]>(getGetLearningPathsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetLearningPathsQueryKey = () => {
+  return [`/api/ai/learning-paths`] as const;
+};
+
+export const getGetLearningPathsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getLearningPaths>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getLearningPaths>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetLearningPathsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getLearningPaths>>
+  > = ({ signal }) => getLearningPaths({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getLearningPaths>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetLearningPathsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getLearningPaths>>
+>;
+export type GetLearningPathsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get all learning paths for current user
+ */
+
+export function useGetLearningPaths<
+  TData = Awaited<ReturnType<typeof getLearningPaths>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getLearningPaths>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetLearningPathsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Generate a new AI learning path for a goal
+ */
+export const getGenerateLearningPathUrl = () => {
+  return `/api/ai/learning-paths`;
+};
+
+export const generateLearningPath = async (
+  generateLearningPathBody: GenerateLearningPathBody,
+  options?: RequestInit,
+): Promise<LearningPath> => {
+  return customFetch<LearningPath>(getGenerateLearningPathUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(generateLearningPathBody),
+  });
+};
+
+export const getGenerateLearningPathMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateLearningPath>>,
+    TError,
+    { data: BodyType<GenerateLearningPathBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof generateLearningPath>>,
+  TError,
+  { data: BodyType<GenerateLearningPathBody> },
+  TContext
+> => {
+  const mutationKey = ["generateLearningPath"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof generateLearningPath>>,
+    { data: BodyType<GenerateLearningPathBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return generateLearningPath(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GenerateLearningPathMutationResult = NonNullable<
+  Awaited<ReturnType<typeof generateLearningPath>>
+>;
+export type GenerateLearningPathMutationBody =
+  BodyType<GenerateLearningPathBody>;
+export type GenerateLearningPathMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Generate a new AI learning path for a goal
+ */
+export const useGenerateLearningPath = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateLearningPath>>,
+    TError,
+    { data: BodyType<GenerateLearningPathBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof generateLearningPath>>,
+  TError,
+  { data: BodyType<GenerateLearningPathBody> },
+  TContext
+> => {
+  return useMutation(getGenerateLearningPathMutationOptions(options));
+};
+
+/**
+ * @summary Mark a learning path step as complete
+ */
+export const getCompleteLearningStepUrl = (pathId: string, stepId: string) => {
+  return `/api/ai/learning-paths/${pathId}/steps/${stepId}/complete`;
+};
+
+export const completeLearningStep = async (
+  pathId: string,
+  stepId: string,
+  options?: RequestInit,
+): Promise<LearningPath> => {
+  return customFetch<LearningPath>(getCompleteLearningStepUrl(pathId, stepId), {
+    ...options,
+    method: "POST",
+  });
+};
+
+export const getCompleteLearningStepMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof completeLearningStep>>,
+    TError,
+    { pathId: string; stepId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof completeLearningStep>>,
+  TError,
+  { pathId: string; stepId: string },
+  TContext
+> => {
+  const mutationKey = ["completeLearningStep"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof completeLearningStep>>,
+    { pathId: string; stepId: string }
+  > = (props) => {
+    const { pathId, stepId } = props ?? {};
+
+    return completeLearningStep(pathId, stepId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CompleteLearningStepMutationResult = NonNullable<
+  Awaited<ReturnType<typeof completeLearningStep>>
+>;
+
+export type CompleteLearningStepMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Mark a learning path step as complete
+ */
+export const useCompleteLearningStep = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof completeLearningStep>>,
+    TError,
+    { pathId: string; stepId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof completeLearningStep>>,
+  TError,
+  { pathId: string; stepId: string },
+  TContext
+> => {
+  return useMutation(getCompleteLearningStepMutationOptions(options));
+};
 
 /**
  * @summary Generate a skill verification quiz using AI
