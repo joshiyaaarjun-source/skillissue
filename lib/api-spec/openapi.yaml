@@ -40,6 +40,8 @@ tags:
     description: AI-powered coaching and learning paths
   - name: sessions
     description: Video sessions and post-session feedback
+  - name: battles
+    description: Skill battles - timed head-to-head challenges
 
 paths:
   /healthz:
@@ -349,6 +351,103 @@ paths:
                 items:
                   $ref: "#/components/schemas/ChatSummary"
 
+  /battles:
+    get:
+      operationId: getBattles
+      tags: [battles]
+      summary: Get all skill battles for voting feed and history
+      responses:
+        "200":
+          description: List of battles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SkillBattle"
+    post:
+      operationId: createBattle
+      tags: [battles]
+      summary: Create a new skill battle challenge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBattleBody"
+      responses:
+        "200":
+          description: Battle created with AI-generated questions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillBattle"
+
+  /battles/{battleId}/submit:
+    post:
+      operationId: submitBattleAnswers
+      tags: [battles]
+      summary: Submit answers for a skill battle
+      parameters:
+        - name: battleId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitBattleBody"
+      responses:
+        "200":
+          description: Battle results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillBattle"
+
+  /battles/{battleId}/vote:
+    post:
+      operationId: voteOnBattle
+      tags: [battles]
+      summary: Vote on a completed battle
+      parameters:
+        - name: battleId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VoteBattleBody"
+      responses:
+        "200":
+          description: Vote recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillBattle"
+
+  /skills/demand:
+    get:
+      operationId: getSkillDemand
+      tags: [users]
+      summary: Get demand level for all skills based on exchange frequency
+      responses:
+        "200":
+          description: Skill demand map
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SkillDemandEntry"
+
   /sessions/start:
     post:
       operationId: startSession
@@ -416,6 +515,48 @@ paths:
                     type: boolean
                 required:
                   - success
+
+  /sessions/{sessionId}/notes:
+    get:
+      operationId: getSessionNotes
+      tags: [sessions]
+      summary: Get notes and whiteboard for a session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Session notes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionNotes"
+    put:
+      operationId: saveSessionNotes
+      tags: [sessions]
+      summary: Save notes and whiteboard strokes for a session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionNotesBody"
+      responses:
+        "200":
+          description: Notes saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionNotes"
 
   /sessions/history:
     get:
@@ -1251,6 +1392,123 @@ components:
         - quizPassed
         - docUploaded
 
+    BattleQuestion:
+      type: object
+      properties:
+        text:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+        correctIndex:
+          type: number
+      required:
+        - text
+        - options
+        - correctIndex
+
+    SkillBattle:
+      type: object
+      properties:
+        id:
+          type: string
+        skill:
+          type: string
+        status:
+          type: string
+          enum: [active, completed, voting]
+        opponentName:
+          type: string
+        opponentAvatar:
+          type: string
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/BattleQuestion"
+        challengerAnswers:
+          type: array
+          items:
+            type: number
+        challengerScore:
+          type: number
+        opponentScore:
+          type: number
+        votesForChallenger:
+          type: number
+        votesForOpponent:
+          type: number
+        timeLimitSeconds:
+          type: number
+        creditsAwarded:
+          type: number
+        badgeAwarded:
+          type: string
+        createdAt:
+          type: string
+        endedAt:
+          type: string
+      required:
+        - id
+        - skill
+        - status
+        - opponentName
+        - opponentAvatar
+        - questions
+        - challengerAnswers
+        - challengerScore
+        - opponentScore
+        - votesForChallenger
+        - votesForOpponent
+        - timeLimitSeconds
+        - creditsAwarded
+        - createdAt
+
+    CreateBattleBody:
+      type: object
+      properties:
+        skill:
+          type: string
+      required:
+        - skill
+
+    SubmitBattleBody:
+      type: object
+      properties:
+        answers:
+          type: array
+          items:
+            type: number
+        timeUsedSeconds:
+          type: number
+      required:
+        - answers
+        - timeUsedSeconds
+
+    VoteBattleBody:
+      type: object
+      properties:
+        voteFor:
+          type: string
+          enum: [challenger, opponent]
+      required:
+        - voteFor
+
+    SkillDemandEntry:
+      type: object
+      properties:
+        skill:
+          type: string
+        level:
+          type: string
+          enum: [high, rising, low]
+        count:
+          type: number
+      required:
+        - skill
+        - level
+        - count
+
     StartSessionBody:
       type: object
       properties:
@@ -1303,6 +1561,35 @@ components:
       required:
         - rating
         - review
+
+    SessionNotes:
+      type: object
+      properties:
+        sessionId:
+          type: string
+        textNotes:
+          type: string
+        strokes:
+          type: array
+          items:
+            type: object
+      required:
+        - sessionId
+        - textNotes
+        - strokes
+
+    SessionNotesBody:
+      type: object
+      properties:
+        textNotes:
+          type: string
+        strokes:
+          type: array
+          items:
+            type: object
+      required:
+        - textNotes
+        - strokes
 
     SkillCoachFeedback:
       type: object

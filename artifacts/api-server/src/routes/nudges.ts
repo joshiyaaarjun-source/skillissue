@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, usersTable, matchesTable, exchangesTable } from "@workspace/db";
-import { eq, or } from "drizzle-orm";
+import { eq, or, and, ne, lt } from "drizzle-orm";
 import { GetNudgesResponse } from "@workspace/api-zod";
 
 const router: IRouter = Router();
@@ -72,6 +72,26 @@ router.get("/nudges", async (req, res): Promise<void> => {
       actionLabel: "Keep going",
       actionRoute: "/explore",
       priority: "medium",
+    });
+  }
+
+  // Anti-ghosting: detect exchanges pending > 3 days
+  const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+  const staleExchanges = await db.select().from(exchangesTable).where(
+    and(
+      or(eq(exchangesTable.teacherId, DEMO_USER_ID), eq(exchangesTable.learnerId, DEMO_USER_ID)),
+      eq(exchangesTable.status, "pending"),
+      lt(exchangesTable.createdAt, threeDaysAgo)
+    )
+  );
+  if (staleExchanges.length > 0) {
+    nudges.push({
+      id: `nudge-ghost-${staleExchanges[0].id}`,
+      type: "anti_ghosting",
+      message: `You have ${staleExchanges.length} exchange${staleExchanges.length > 1 ? "s" : ""} with no response for 3+ days. Don't ghost — relationships matter more than comfort.`,
+      actionLabel: "View exchanges",
+      actionRoute: "/matches",
+      priority: "high",
     });
   }
 

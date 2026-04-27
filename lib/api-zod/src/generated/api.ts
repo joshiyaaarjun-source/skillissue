@@ -465,6 +465,150 @@ export const GetChatListResponseItem = zod.object({
 export const GetChatListResponse = zod.array(GetChatListResponseItem);
 
 /**
+ * @summary Get all skill battles for voting feed and history
+ */
+export const GetBattlesResponseItem = zod.object({
+  id: zod.string(),
+  skill: zod.string(),
+  status: zod.enum(["active", "completed", "voting"]),
+  opponentName: zod.string(),
+  opponentAvatar: zod.string(),
+  questions: zod.array(
+    zod.object({
+      text: zod.string(),
+      options: zod.array(zod.string()),
+      correctIndex: zod.number(),
+    }),
+  ),
+  challengerAnswers: zod.array(zod.number()),
+  challengerScore: zod.number(),
+  opponentScore: zod.number(),
+  votesForChallenger: zod.number(),
+  votesForOpponent: zod.number(),
+  timeLimitSeconds: zod.number(),
+  creditsAwarded: zod.number(),
+  badgeAwarded: zod.string().optional(),
+  createdAt: zod.string(),
+  endedAt: zod.string().optional(),
+});
+export const GetBattlesResponse = zod.array(GetBattlesResponseItem);
+
+/**
+ * @summary Create a new skill battle challenge
+ */
+export const CreateBattleBody = zod.object({
+  skill: zod.string(),
+});
+
+export const CreateBattleResponse = zod.object({
+  id: zod.string(),
+  skill: zod.string(),
+  status: zod.enum(["active", "completed", "voting"]),
+  opponentName: zod.string(),
+  opponentAvatar: zod.string(),
+  questions: zod.array(
+    zod.object({
+      text: zod.string(),
+      options: zod.array(zod.string()),
+      correctIndex: zod.number(),
+    }),
+  ),
+  challengerAnswers: zod.array(zod.number()),
+  challengerScore: zod.number(),
+  opponentScore: zod.number(),
+  votesForChallenger: zod.number(),
+  votesForOpponent: zod.number(),
+  timeLimitSeconds: zod.number(),
+  creditsAwarded: zod.number(),
+  badgeAwarded: zod.string().optional(),
+  createdAt: zod.string(),
+  endedAt: zod.string().optional(),
+});
+
+/**
+ * @summary Submit answers for a skill battle
+ */
+export const SubmitBattleAnswersParams = zod.object({
+  battleId: zod.coerce.string(),
+});
+
+export const SubmitBattleAnswersBody = zod.object({
+  answers: zod.array(zod.number()),
+  timeUsedSeconds: zod.number(),
+});
+
+export const SubmitBattleAnswersResponse = zod.object({
+  id: zod.string(),
+  skill: zod.string(),
+  status: zod.enum(["active", "completed", "voting"]),
+  opponentName: zod.string(),
+  opponentAvatar: zod.string(),
+  questions: zod.array(
+    zod.object({
+      text: zod.string(),
+      options: zod.array(zod.string()),
+      correctIndex: zod.number(),
+    }),
+  ),
+  challengerAnswers: zod.array(zod.number()),
+  challengerScore: zod.number(),
+  opponentScore: zod.number(),
+  votesForChallenger: zod.number(),
+  votesForOpponent: zod.number(),
+  timeLimitSeconds: zod.number(),
+  creditsAwarded: zod.number(),
+  badgeAwarded: zod.string().optional(),
+  createdAt: zod.string(),
+  endedAt: zod.string().optional(),
+});
+
+/**
+ * @summary Vote on a completed battle
+ */
+export const VoteOnBattleParams = zod.object({
+  battleId: zod.coerce.string(),
+});
+
+export const VoteOnBattleBody = zod.object({
+  voteFor: zod.enum(["challenger", "opponent"]),
+});
+
+export const VoteOnBattleResponse = zod.object({
+  id: zod.string(),
+  skill: zod.string(),
+  status: zod.enum(["active", "completed", "voting"]),
+  opponentName: zod.string(),
+  opponentAvatar: zod.string(),
+  questions: zod.array(
+    zod.object({
+      text: zod.string(),
+      options: zod.array(zod.string()),
+      correctIndex: zod.number(),
+    }),
+  ),
+  challengerAnswers: zod.array(zod.number()),
+  challengerScore: zod.number(),
+  opponentScore: zod.number(),
+  votesForChallenger: zod.number(),
+  votesForOpponent: zod.number(),
+  timeLimitSeconds: zod.number(),
+  creditsAwarded: zod.number(),
+  badgeAwarded: zod.string().optional(),
+  createdAt: zod.string(),
+  endedAt: zod.string().optional(),
+});
+
+/**
+ * @summary Get demand level for all skills based on exchange frequency
+ */
+export const GetSkillDemandResponseItem = zod.object({
+  skill: zod.string(),
+  level: zod.enum(["high", "rising", "low"]),
+  count: zod.number(),
+});
+export const GetSkillDemandResponse = zod.array(GetSkillDemandResponseItem);
+
+/**
  * @summary Start a new video session for a match
  */
 export const StartSessionBody = zod.object({
@@ -517,6 +661,37 @@ export const SubmitSessionFeedbackBody = zod.object({
 
 export const SubmitSessionFeedbackResponse = zod.object({
   success: zod.boolean(),
+});
+
+/**
+ * @summary Get notes and whiteboard for a session
+ */
+export const GetSessionNotesParams = zod.object({
+  sessionId: zod.coerce.string(),
+});
+
+export const GetSessionNotesResponse = zod.object({
+  sessionId: zod.string(),
+  textNotes: zod.string(),
+  strokes: zod.array(zod.object({}).passthrough()),
+});
+
+/**
+ * @summary Save notes and whiteboard strokes for a session
+ */
+export const SaveSessionNotesParams = zod.object({
+  sessionId: zod.coerce.string(),
+});
+
+export const SaveSessionNotesBody = zod.object({
+  textNotes: zod.string(),
+  strokes: zod.array(zod.object({}).passthrough()),
+});
+
+export const SaveSessionNotesResponse = zod.object({
+  sessionId: zod.string(),
+  textNotes: zod.string(),
+  strokes: zod.array(zod.object({}).passthrough()),
 });
 
 /**

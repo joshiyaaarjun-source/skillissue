@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, sessionsTable, sessionFeedbackTable, usersTable, exchangesTable, matchesTable } from "@workspace/db";
+import { db, sessionsTable, sessionFeedbackTable, sessionNotesTable, usersTable, exchangesTable, matchesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { StartSessionBody, SubmitSessionFeedbackBody } from "@workspace/api-zod";
 
@@ -115,6 +115,41 @@ router.post("/sessions/:sessionId/feedback", async (req, res): Promise<void> => 
   }
 
   res.json({ success: true });
+});
+
+// GET /sessions/:sessionId/notes
+router.get("/sessions/:sessionId/notes", async (req, res): Promise<void> => {
+  const sessionId = parseInt(req.params.sessionId, 10);
+  const [notes] = await db.select().from(sessionNotesTable).where(eq(sessionNotesTable.sessionId, sessionId));
+  if (!notes) {
+    res.json({ sessionId: String(sessionId), textNotes: "", strokes: [] });
+    return;
+  }
+  res.json({ sessionId: String(notes.sessionId), textNotes: notes.textNotes, strokes: notes.strokes as object[] });
+});
+
+// PUT /sessions/:sessionId/notes
+router.put("/sessions/:sessionId/notes", async (req, res): Promise<void> => {
+  const sessionId = parseInt(req.params.sessionId, 10);
+  const { textNotes = "", strokes = [] } = req.body as { textNotes?: string; strokes?: object[] };
+
+  const [existing] = await db.select().from(sessionNotesTable).where(eq(sessionNotesTable.sessionId, sessionId));
+  let result;
+  if (existing) {
+    [result] = await db.update(sessionNotesTable).set({
+      textNotes,
+      strokes,
+      updatedAt: new Date(),
+    }).where(eq(sessionNotesTable.sessionId, sessionId)).returning();
+  } else {
+    [result] = await db.insert(sessionNotesTable).values({
+      sessionId,
+      userId: DEMO_USER_ID,
+      textNotes,
+      strokes,
+    }).returning();
+  }
+  res.json({ sessionId: String(result.sessionId), textNotes: result.textNotes, strokes: result.strokes as object[] });
 });
 
 // GET /sessions/history

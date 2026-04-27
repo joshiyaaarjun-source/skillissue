@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { MessageCircle, Handshake, Star, Clock, ShieldCheck, TrendingUp, Users, Coins, Video } from "lucide-react";
+import { MessageCircle, Handshake, Star, Clock, ShieldCheck, TrendingUp, Users, Coins, Video, Flag } from "lucide-react";
 import {
   useGetMatches, getGetMatchesQueryKey,
   useGetExchanges, getGetExchangesQueryKey,
@@ -9,6 +9,7 @@ import {
 import { Link, useLocation } from "wouter";
 import BottomNav from "@/components/BottomNav";
 import ExchangeModal from "@/components/ExchangeModal";
+import ReportModal from "@/components/ReportModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,8 @@ export default function Matches() {
 
   const [selectedPartner, setSelectedPartner] = useState<ExploreUser | null>(null);
   const [selectedMatchId, setSelectedMatchId] = useState<string>("");
+  const [reportTarget, setReportTarget] = useState<{ id: number; name: string } | null>(null);
+
 
   const isLoading = matchesLoading || exchangesLoading;
 
@@ -210,6 +213,13 @@ export default function Matches() {
                             <Handshake size={14} className="mr-1.5" /> Propose
                           </Button>
                         </div>
+                        <button
+                          onClick={() => setReportTarget({ id: parseInt(match.matchedUser.id), name: match.matchedUser.name })}
+                          className="mt-2 flex items-center gap-1 text-[10px] text-muted-foreground/50 hover:text-destructive transition-colors"
+                        >
+                          <Flag size={10} />
+                          Report user
+                        </button>
                       </div>
                     </div>
                   </motion.div>
@@ -264,6 +274,15 @@ export default function Matches() {
         partner={selectedPartner}
         matchId={selectedMatchId}
       />
+
+      {reportTarget && (
+        <ReportModal
+          open={!!reportTarget}
+          onClose={() => setReportTarget(null)}
+          reportedUserId={reportTarget.id}
+          reportedUserName={reportTarget.name}
+        />
+      )}
 
       <BottomNav />
     </div>

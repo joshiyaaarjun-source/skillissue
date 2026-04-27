@@ -18,6 +18,10 @@ import Quiz from "@/pages/Quiz";
 import Upload from "@/pages/Upload";
 import LearningPaths from "@/pages/LearningPaths";
 import VideoSession from "@/pages/VideoSession";
+import SkillBattles from "@/pages/SkillBattles";
+import MicroLessons from "@/pages/MicroLessons";
+import Notifications from "@/pages/Notifications";
+import FeatureFlags from "@/pages/FeatureFlags";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +42,10 @@ function Router() {
       <Route path="/upload" component={Upload} />
       <Route path="/learning-paths" component={LearningPaths} />
       <Route path="/session/:matchId" component={VideoSession} />
+      <Route path="/battles" component={SkillBattles} />
+      <Route path="/lessons" component={MicroLessons} />
+      <Route path="/notifications" component={Notifications} />
+      <Route path="/flags" component={FeatureFlags} />
       <Route component={NotFound} />
     </Switch>
   );

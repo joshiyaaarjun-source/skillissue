@@ -379,6 +379,76 @@ export interface SkillVerification {
   status?: SkillVerificationStatus;
 }
 
+export interface BattleQuestion {
+  text: string;
+  options: string[];
+  correctIndex: number;
+}
+
+export type SkillBattleStatus =
+  (typeof SkillBattleStatus)[keyof typeof SkillBattleStatus];
+
+export const SkillBattleStatus = {
+  active: "active",
+  completed: "completed",
+  voting: "voting",
+} as const;
+
+export interface SkillBattle {
+  id: string;
+  skill: string;
+  status: SkillBattleStatus;
+  opponentName: string;
+  opponentAvatar: string;
+  questions: BattleQuestion[];
+  challengerAnswers: number[];
+  challengerScore: number;
+  opponentScore: number;
+  votesForChallenger: number;
+  votesForOpponent: number;
+  timeLimitSeconds: number;
+  creditsAwarded: number;
+  badgeAwarded?: string;
+  createdAt: string;
+  endedAt?: string;
+}
+
+export interface CreateBattleBody {
+  skill: string;
+}
+
+export interface SubmitBattleBody {
+  answers: number[];
+  timeUsedSeconds: number;
+}
+
+export type VoteBattleBodyVoteFor =
+  (typeof VoteBattleBodyVoteFor)[keyof typeof VoteBattleBodyVoteFor];
+
+export const VoteBattleBodyVoteFor = {
+  challenger: "challenger",
+  opponent: "opponent",
+} as const;
+
+export interface VoteBattleBody {
+  voteFor: VoteBattleBodyVoteFor;
+}
+
+export type SkillDemandEntryLevel =
+  (typeof SkillDemandEntryLevel)[keyof typeof SkillDemandEntryLevel];
+
+export const SkillDemandEntryLevel = {
+  high: "high",
+  rising: "rising",
+  low: "low",
+} as const;
+
+export interface SkillDemandEntry {
+  skill: string;
+  level: SkillDemandEntryLevel;
+  count: number;
+}
+
 export interface StartSessionBody {
   matchId: string;
   exchangeId?: string;
@@ -407,6 +477,21 @@ export interface Session {
 export interface SessionFeedbackBody {
   rating: number;
   review: string;
+}
+
+export type SessionNotesStrokesItem = { [key: string]: unknown };
+
+export interface SessionNotes {
+  sessionId: string;
+  textNotes: string;
+  strokes: SessionNotesStrokesItem[];
+}
+
+export type SessionNotesBodyStrokesItem = { [key: string]: unknown };
+
+export interface SessionNotesBody {
+  textNotes: string;
+  strokes: SessionNotesBodyStrokesItem[];
 }
 
 export interface SkillCoachFeedback {

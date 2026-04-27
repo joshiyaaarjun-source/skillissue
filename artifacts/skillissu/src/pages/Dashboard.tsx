@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Star, Flame, Zap, ArrowRight, BookOpen, User as UserIcon, Brain, ChevronDown, ChevronUp, CheckCircle2, Lightbulb, AlertCircle, RefreshCw, Map } from "lucide-react";
-import { useGetMe, getGetMeQueryKey, useGetNudges, getGetNudgesQueryKey, useGetExchanges, getGetExchangesQueryKey, useGetSkillCoach, getGetSkillCoachQueryKey } from "@workspace/api-client-react";
+import { Star, Flame, Zap, ArrowRight, BookOpen, User as UserIcon, Brain, ChevronDown, ChevronUp, CheckCircle2, Lightbulb, AlertCircle, RefreshCw, Map, Swords, Bell, Crown, Flag } from "lucide-react";
+import { useGetMe, getGetMeQueryKey, useGetNudges, getGetNudgesQueryKey, useGetExchanges, getGetExchangesQueryKey, useGetSkillCoach, getGetSkillCoachQueryKey, useGetNotifications, getGetNotificationsQueryKey } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import BottomNav from "@/components/BottomNav";
 import FakeNotificationBanner from "@/components/FakeNotificationBanner";
@@ -34,7 +34,11 @@ export default function Dashboard() {
   const { data: nudges, isLoading: nudgesLoading } = useGetNudges({ query: { queryKey: getGetNudgesQueryKey() } });
   const { data: exchanges, isLoading: exchangesLoading } = useGetExchanges({ query: { queryKey: getGetExchangesQueryKey() } });
   const { data: coach, isLoading: coachLoading, refetch: refetchCoach } = useGetSkillCoach({ query: { queryKey: getGetSkillCoachQueryKey() } });
+  const { data: notifications } = useGetNotifications({ query: { queryKey: getGetNotificationsQueryKey() } });
   const [coachExpanded, setCoachExpanded] = useState(false);
+
+  const unreadNotifCount = notifications?.filter(n => !n.read).length ?? 0;
+  const isElite = me ? (me.credibilityScore >= 4.5 && me.totalExchanges >= 5) : false;
   const queryClient = useQueryClient();
 
   if (meLoading || nudgesLoading || exchangesLoading) {
@@ -77,11 +81,36 @@ export default function Dashboard() {
             </div>
           </div>
           
-          <div className="text-right">
-            <div className="text-xs font-medium text-[#ffd9d9] uppercase tracking-wider mb-1">Balance</div>
-            <div className="text-3xl font-black tabular-nums flex items-baseline gap-1">
-              <CreditCounter value={me.creditBalance} />
-              <span className="text-lg text-[#ffd9d9]">C</span>
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-2">
+              {isElite && (
+                <span className="flex items-center gap-1 text-[10px] font-bold bg-yellow-400/20 text-yellow-300 border border-yellow-400/30 px-2 py-0.5 rounded-full">
+                  <Crown className="h-3 w-3 fill-current" />
+                  Elite
+                </span>
+              )}
+              <Link href="/notifications">
+                <button className="relative p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
+                  <Bell className="h-5 w-5 text-[#ffd9d9]" />
+                  {unreadNotifCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 text-[#4d0011] text-[9px] font-black rounded-full flex items-center justify-center">
+                      {unreadNotifCount > 9 ? "9+" : unreadNotifCount}
+                    </span>
+                  )}
+                </button>
+              </Link>
+              <Link href="/flags">
+                <button className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
+                  <Flag className="h-4 w-4 text-[#ffd9d9]/60" />
+                </button>
+              </Link>
+            </div>
+            <div className="text-right">
+              <div className="text-xs font-medium text-[#ffd9d9] uppercase tracking-wider mb-1">Balance</div>
+              <div className="text-3xl font-black tabular-nums flex items-baseline gap-1">
+                <CreditCounter value={me.creditBalance} />
+                <span className="text-lg text-[#ffd9d9]">C</span>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -214,6 +243,38 @@ export default function Dashboard() {
                 <p className="text-xs text-[#ffd9d9]/70 mt-1 italic">Tell us your goal. We'll build the roadmap.</p>
               </div>
               <ArrowRight className="h-5 w-5 text-[#ffd9d9]/60" />
+            </div>
+          </Link>
+        </motion.div>
+
+        {/* Skill Battles CTA */}
+        <motion.div variants={itemVariants}>
+          <Link href="/battles">
+            <div className="bg-[#102b1f] text-white rounded-2xl p-4 flex items-center gap-4 shadow-md hover:bg-[#102b1f]/90 transition-colors cursor-pointer">
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Swords className="h-6 w-6 text-green-300" />
+              </div>
+              <div className="flex-1">
+                <p className="font-bold text-base text-white leading-none">Skill Battles</p>
+                <p className="text-xs text-green-300/70 mt-1 italic">Challenge the community. Prove your mastery.</p>
+              </div>
+              <ArrowRight className="h-5 w-5 text-green-300/60" />
+            </div>
+          </Link>
+        </motion.div>
+
+        {/* Micro-Lessons CTA */}
+        <motion.div variants={itemVariants}>
+          <Link href="/lessons">
+            <div className="bg-[#bd7880] text-white rounded-2xl p-4 flex items-center gap-4 shadow-md hover:bg-[#bd7880]/90 transition-colors cursor-pointer">
+              <div className="w-12 h-12 bg-white/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                <BookOpen className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="font-bold text-base text-white leading-none">Micro-Lessons</p>
+                <p className="text-xs text-white/70 mt-1 italic">5-minute AI lessons tailored to your skills.</p>
+              </div>
+              <ArrowRight className="h-5 w-5 text-white/60" />
             </div>
           </Link>
         </motion.div>

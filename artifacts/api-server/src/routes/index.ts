@@ -15,6 +15,14 @@ import verificationRouter from "./verification";
 import onboardingRouter from "./onboarding";
 import aiRouter from "./ai";
 import sessionsRouter from "./sessions";
+import skillsRouter from "./skills";
+import battlesRouter from "./battles";
+import referralRouter from "./referral";
+import safetyRouter from "./safety";
+import lessonsRouter from "./lessons";
+import portfolioRouter from "./portfolio";
+import instantMatchRouter from "./instant-match";
+import featureFlagsRouter from "./feature-flags";
 
 const router: IRouter = Router();
 
@@ -34,5 +42,13 @@ router.use(verificationRouter);
 router.use(onboardingRouter);
 router.use(aiRouter);
 router.use(sessionsRouter);
+router.use(skillsRouter);
+router.use(battlesRouter);
+router.use(referralRouter);
+router.use(safetyRouter);
+router.use(lessonsRouter);
+router.use(portfolioRouter);
+router.use(instantMatchRouter);
+router.use(featureFlagsRouter);
 
 export default router;

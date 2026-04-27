@@ -3,8 +3,9 @@ import { useParams, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Mic, MicOff, Video, VideoOff, PhoneOff, MessageSquare,
-  Clock, Star, ChevronRight, Loader2, CheckCircle2
+  Clock, Star, ChevronRight, Loader2, CheckCircle2, PenLine
 } from "lucide-react";
+import SessionNotesPanel from "@/components/SessionNotesPanel";
 import { useStartSession, useEndSession, useSubmitSessionFeedback } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -155,6 +156,7 @@ export default function VideoSession() {
   const [muted, setMuted] = useState(false);
   const [cameraOff, setCameraOff] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
   const [chatMsg, setChatMsg] = useState("");
   const [chatLog, setChatLog] = useState<{ me: boolean; text: string }[]>([]);
 
@@ -364,13 +366,31 @@ export default function VideoSession() {
         </button>
       </div>
 
-      {/* Chat toggle */}
-      <button
-        onClick={() => setShowChat(s => !s)}
-        className="absolute bottom-28 left-4 z-20 w-10 h-10 bg-white/10 backdrop-blur rounded-full flex items-center justify-center"
-      >
-        <MessageSquare size={18} className="text-white" />
-      </button>
+      {/* Chat + Notes toggles */}
+      <div className="absolute bottom-28 left-4 z-20 flex flex-col gap-2">
+        <button
+          onClick={() => { setShowChat(s => !s); setShowNotes(false); }}
+          className={`w-10 h-10 backdrop-blur rounded-full flex items-center justify-center ${showChat ? "bg-[#bd7880]" : "bg-white/10"}`}
+        >
+          <MessageSquare size={18} className="text-white" />
+        </button>
+        <button
+          onClick={() => { setShowNotes(s => !s); setShowChat(false); }}
+          className={`w-10 h-10 backdrop-blur rounded-full flex items-center justify-center ${showNotes ? "bg-[#bd7880]" : "bg-white/10"}`}
+        >
+          <PenLine size={18} className="text-white" />
+        </button>
+      </div>
+
+      {/* Notes & Whiteboard panel */}
+      <AnimatePresence>
+        {showNotes && session && (
+          <SessionNotesPanel
+            sessionId={session.id}
+            onClose={() => setShowNotes(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Feedback modal */}
       <AnimatePresence>

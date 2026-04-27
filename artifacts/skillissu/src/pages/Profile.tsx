@@ -1,17 +1,69 @@
+import { useState, useEffect } from "react";
 import { useGetMe, getGetMeQueryKey, useGetExchanges, getGetExchangesQueryKey } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Star, CheckCircle, Upload } from "lucide-react";
+import { Star, CheckCircle, Upload, Copy, Check, Gift, Users, ShieldCheck as ShieldCheckIcon, Crown, ArrowRight, ArrowLeft } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import CreditCounter from "@/components/CreditCounter";
+import PortfolioSection from "@/components/PortfolioSection";
+
+type ReferralData = {
+  code: string;
+  inviteLink: string;
+  referralCount: number;
+  creditsEarned: number;
+  rewardPerReferral: number;
+  message: string;
+};
 
 export default function Profile() {
+  const queryClient = useQueryClient();
   const { data: me, isLoading: meLoading } = useGetMe({ query: { queryKey: getGetMeQueryKey() } });
   const { data: exchanges, isLoading: exchangesLoading } = useGetExchanges({ query: { queryKey: getGetExchangesQueryKey() } });
+  const [referral, setReferral] = useState<ReferralData | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [redeemCode, setRedeemCode] = useState("");
+  const [redeemMsg, setRedeemMsg] = useState<string | null>(null);
+  const [redeemLoading, setRedeemLoading] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/referral").then(r => r.json()).then(setReferral).catch(() => {});
+  }, []);
+
+  const copyLink = () => {
+    if (!referral) return;
+    navigator.clipboard.writeText(referral.inviteLink).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const redeemReferral = async () => {
+    if (!redeemCode.trim()) return;
+    setRedeemLoading(true);
+    setRedeemMsg(null);
+    try {
+      const r = await fetch("/api/referral/redeem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: redeemCode.trim() }),
+      });
+      const data = await r.json() as { message?: string; error?: string };
+      setRedeemMsg(data.message ?? data.error ?? "Done");
+      if (r.ok) {
+        setRedeemCode("");
+        queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
+      }
+    } finally {
+      setRedeemLoading(false);
+    }
+  };
 
   if (meLoading || exchangesLoading) {
     return (
@@ -25,6 +77,7 @@ export default function Profile() {
   if (!me) return null;
 
   const activeExchange = exchanges?.find(e => e.status === 'active');
+  const isElite = me.credibilityScore >= 4.5 && me.totalExchanges >= 5;
 
   return (
     <div className="min-h-[100dvh] bg-background pb-24 overflow-x-hidden">
@@ -36,7 +89,15 @@ export default function Profile() {
               {me.name.charAt(0)}
             </AvatarFallback>
           </Avatar>
-          <h1 className="text-3xl font-bold mb-2">{me.name}</h1>
+          <div className="flex items-center gap-2 mb-2">
+            <h1 className="text-3xl font-bold">{me.name}</h1>
+            {isElite && (
+              <span className="flex items-center gap-1 text-[10px] font-bold bg-yellow-400/20 text-yellow-300 border border-yellow-400/30 px-2 py-0.5 rounded-full">
+                <Crown className="h-3 w-3 fill-current" />
+                Elite
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-1 text-[#ffd9d9] mb-4">
             <Star className="h-5 w-5 fill-current" />
             <span className="font-bold text-lg">{me.credibilityScore.toFixed(1)}</span>
@@ -128,26 +189,146 @@ export default function Profile() {
           </div>
         </div>
 
+        {/* Portfolio */}
+        <PortfolioSection userSkills={[...(me.skillsOffered ?? []), ...(me.skillsWanted ?? [])]} />
+
+        {/* Referral System */}
         <div className="space-y-4">
-          <h3 className="text-xl font-bold font-serif italic">Recent Exchanges</h3>
-          <div className="space-y-3">
-            {exchanges?.filter(e => e.status === 'completed').slice(0, 3).map(exchange => (
-              <div key={exchange.id} className="bg-card border border-border rounded-xl p-4 shadow-sm flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={exchange.partnerAvatar} />
-                  <AvatarFallback>{exchange.partnerName.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <p className="text-sm font-bold">{exchange.partnerName}</p>
-                  <p className="text-xs text-muted-foreground">Taught {exchange.teachSkill}</p>
-                </div>
-                <CheckCircle className="h-5 w-5 text-green-500" />
+          <h3 className="text-xl font-bold font-serif italic">Invite Friends</h3>
+          <div className="bg-gradient-to-br from-[#4d0011]/8 to-[#ffd9d9]/30 border border-[#bd7880]/30 rounded-2xl p-4 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#4d0011] rounded-xl flex items-center justify-center flex-shrink-0">
+                <Gift className="h-5 w-5 text-[#ffd9d9]" />
               </div>
-            ))}
-            {(!exchanges || exchanges.filter(e => e.status === 'completed').length === 0) && (
-              <p className="text-sm text-muted-foreground">No completed exchanges yet.</p>
+              <div>
+                <p className="font-bold text-sm text-[#4d0011]">Refer & Earn</p>
+                <p className="text-xs text-muted-foreground">You both get 15 credits when they join</p>
+              </div>
+            </div>
+
+            {referral ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 bg-white/60 border border-[#bd7880]/40 rounded-lg px-3 py-2 text-xs font-mono text-[#4d0011] truncate">
+                    {referral.inviteLink}
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={copyLink}
+                    className="bg-[#4d0011] hover:bg-[#4d0011]/90 text-white shrink-0"
+                  >
+                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    <span className="ml-1 text-xs">{copied ? "Copied!" : "Copy"}</span>
+                  </Button>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex-1 bg-white/50 rounded-xl p-3 text-center border border-white/60">
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <Users className="h-4 w-4 text-[#4d0011]" />
+                    </div>
+                    <div className="text-xl font-black text-[#4d0011]">{referral.referralCount}</div>
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Referred</div>
+                  </div>
+                  <div className="flex-1 bg-white/50 rounded-xl p-3 text-center border border-white/60">
+                    <div className="text-xl font-black text-[#4d0011]">{referral.creditsEarned}</div>
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Credits Earned</div>
+                  </div>
+                  <div className="flex-1 bg-white/50 rounded-xl p-3 text-center border border-white/60">
+                    <div className="text-xl font-black text-[#4d0011]">{referral.rewardPerReferral}</div>
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Per Referral</div>
+                  </div>
+                </div>
+
+                <div className="border-t border-[#bd7880]/20 pt-3 space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground">Have a friend's code? Redeem it:</p>
+                  <div className="flex gap-2">
+                    <Input
+                      value={redeemCode}
+                      onChange={e => setRedeemCode(e.target.value)}
+                      placeholder="e.g. jamie-01"
+                      className="text-sm h-9"
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={redeemReferral}
+                      disabled={redeemLoading || !redeemCode.trim()}
+                      className="border-[#4d0011]/30 text-[#4d0011] shrink-0"
+                    >
+                      {redeemLoading ? "..." : "Redeem"}
+                    </Button>
+                  </div>
+                  {redeemMsg && (
+                    <p className={`text-xs font-medium ${redeemMsg.includes("earned") ? "text-green-600" : "text-destructive"}`}>
+                      {redeemMsg}
+                    </p>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="text-sm text-muted-foreground animate-pulse">Loading referral info...</div>
             )}
           </div>
+        </div>
+
+        {/* Skill Timeline — Feature #27 */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold font-serif italic">Skill Journey</h3>
+            <span className="text-xs text-muted-foreground">
+              {exchanges?.filter(e => e.status === 'completed').length ?? 0} completed
+            </span>
+          </div>
+          {(!exchanges || exchanges.filter(e => e.status === 'completed').length === 0) ? (
+            <p className="text-sm text-muted-foreground italic">Your skill journey starts with the first exchange.</p>
+          ) : (
+            <div className="relative ml-4">
+              {/* Vertical line */}
+              <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#4d0011]/30 via-[#bd7880]/30 to-transparent" />
+              <div className="space-y-4">
+                {exchanges?.filter(e => e.status === 'completed').map((exchange, i) => (
+                  <div key={exchange.id} className="relative flex gap-4 items-start">
+                    {/* Node */}
+                    <div className={`relative z-10 w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 mt-1 ${
+                      i === 0 ? "bg-[#4d0011] border-[#4d0011]" : "bg-background border-[#bd7880]/50"
+                    }`}>
+                      {i === 0 ? (
+                        <span className="text-white text-[8px]">★</span>
+                      ) : (
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#bd7880]/50" />
+                      )}
+                    </div>
+                    {/* Content */}
+                    <div className={`flex-1 rounded-2xl p-3 border shadow-sm ${
+                      i === 0 ? "bg-card border-[#4d0011]/20" : "bg-card/60 border-border"
+                    }`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={exchange.partnerAvatar} />
+                          <AvatarFallback className="text-[9px]">{exchange.partnerName[0]}</AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-bold">{exchange.partnerName}</span>
+                        {i === 0 && <span className="text-[10px] bg-[#4d0011]/10 text-[#4d0011] px-1.5 py-0.5 rounded-full font-semibold">Latest</span>}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                        <span className="flex items-center gap-1 bg-[#102b1f]/10 text-[#102b1f] px-2 py-0.5 rounded-full font-medium">
+                          <ArrowRight className="h-3 w-3" />
+                          Taught {exchange.teachSkill}
+                        </span>
+                        {exchange.learnSkill && (
+                          <span className="flex items-center gap-1 bg-[#4d0011]/10 text-[#4d0011] px-2 py-0.5 rounded-full font-medium">
+                            <ArrowLeft className="h-3 w-3" />
+                            Learned {exchange.learnSkill}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence, useAnimation, PanInfo } from "framer-motion";
-import { X, Heart, Info, Star, ShieldCheck, Zap, Sparkles } from "lucide-react";
-import { useGetExploreUsers, getGetExploreUsersQueryKey, useRecordSwipe, useGetMe, getGetMeQueryKey } from "@workspace/api-client-react";
+import { X, Heart, Info, Star, ShieldCheck, Zap, Sparkles, Crown } from "lucide-react";
+import InstantMatchModal from "@/components/InstantMatchModal";
+import { useGetExploreUsers, getGetExploreUsersQueryKey, useRecordSwipe, useGetMe, getGetMeQueryKey, useGetSkillDemand, getGetSkillDemandQueryKey } from "@workspace/api-client-react";
+import type { SkillDemandEntry } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import BottomNav from "@/components/BottomNav";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,13 +12,27 @@ import { Button } from "@/components/ui/button";
 import type { ExploreUser } from "@workspace/api-client-react";
 import confetti from "canvas-confetti";
 
-function SkillPill({ label, variant }: { label: string; variant: "offered" | "wanted" }) {
+function getDemandInfo(skill: string, demand: SkillDemandEntry[]): { emoji: string; label: string } | null {
+  const entry = demand.find(d => d.skill.toLowerCase() === skill.toLowerCase());
+  if (!entry) return null;
+  if (entry.level === "high") return { emoji: "🔥", label: "High" };
+  if (entry.level === "rising") return { emoji: "📈", label: "Rising" };
+  return { emoji: "🧊", label: "Low" };
+}
+
+function SkillPill({ label, variant, demand }: {
+  label: string;
+  variant: "offered" | "wanted";
+  demand?: SkillDemandEntry[];
+}) {
+  const info = demand ? getDemandInfo(label, demand) : null;
   return (
-    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
       variant === "offered"
         ? "bg-[#bd7880] text-white"
         : "border border-[#ffd9d9]/60 text-[#ffd9d9] bg-transparent"
     }`}>
+      {info && <span className="text-[10px] leading-none" title={`${info.label} demand`}>{info.emoji}</span>}
       {label}
     </span>
   );
@@ -133,6 +149,7 @@ function ProfilePreviewSheet({
 export default function Explore() {
   const { data: users, isLoading } = useGetExploreUsers({ query: { queryKey: getGetExploreUsersQueryKey() } });
   const { data: me } = useGetMe({ query: { queryKey: getGetMeQueryKey() } });
+  const { data: demandData } = useGetSkillDemand({ query: { queryKey: getGetSkillDemandQueryKey() } });
   const recordSwipe = useRecordSwipe();
   const queryClient = useQueryClient();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -140,11 +157,47 @@ export default function Explore() {
   const [matchedUser, setMatchedUser] = useState<ExploreUser | null>(null);
   const [previewUser, setPreviewUser] = useState<ExploreUser | null>(null);
   const [swipeHint, setSwipeHint] = useState<"left" | "right" | null>(null);
+  const [showInstantMatch, setShowInstantMatch] = useState(false);
+  const [mood, setMood] = useState<string | null>(null);
+  const [combosOnly, setCombosOnly] = useState(false);
   const controls = useAnimation();
 
+  const MOODS = [
+    { id: "relaxed", label: "🧘 Relaxed", tags: ["yoga", "meditation", "cooking", "gardening", "music", "art", "writing"] },
+    { id: "focused", label: "🎯 Focused", tags: ["coding", "design", "math", "science", "programming", "data"] },
+    { id: "creative", label: "🎨 Creative", tags: ["art", "design", "writing", "photography", "music", "film", "drawing"] },
+    { id: "fast", label: "⚡ Fast", tags: ["coding", "engineering", "tech", "react", "python", "javascript", "sql"] },
+  ];
+
+  const displayUsers = useMemo(() => {
+    if (!users) return [];
+    const myWanted = (me?.skillsWanted ?? []).map(s => s.toLowerCase());
+
+    let filtered = users.filter(u => {
+      if (combosOnly) {
+        const comboCount = u.skillsOffered.filter(s => myWanted.includes(s.toLowerCase())).length;
+        if (comboCount < 2) return false;
+      }
+      return true;
+    });
+
+    if (mood) {
+      const moodEntry = MOODS.find(m => m.id === mood);
+      if (moodEntry) {
+        filtered = [...filtered].sort((a, b) => {
+          const aScore = a.skillsOffered.filter(s => moodEntry.tags.some(t => s.toLowerCase().includes(t))).length;
+          const bScore = b.skillsOffered.filter(s => moodEntry.tags.some(t => s.toLowerCase().includes(t))).length;
+          return bScore - aScore;
+        });
+      }
+    }
+
+    return filtered;
+  }, [users, mood, combosOnly, me?.skillsWanted]);
+
   const handleSwipe = async (direction: "left" | "right") => {
-    if (!users) return;
-    const currentUser = users[currentIndex];
+    if (!displayUsers.length) return;
+    const currentUser = displayUsers[currentIndex];
 
     await controls.start({
       x: direction === "right" ? 520 : -520,
@@ -199,7 +252,7 @@ export default function Explore() {
     );
   }
 
-  if (!users || currentIndex >= users.length) {
+  if (!users || currentIndex >= displayUsers.length) {
     return (
       <div className="min-h-[100dvh] flex flex-col items-center justify-center p-6 bg-background pb-24 text-center">
         <Sparkles className="h-12 w-12 text-[#bd7880] mb-4 opacity-60" />
@@ -210,15 +263,51 @@ export default function Explore() {
     );
   }
 
-  const currentUser = users[currentIndex];
-  const nextUser = users[currentIndex + 1];
+  const currentUser = displayUsers[currentIndex];
+  const nextUser = displayUsers[currentIndex + 1];
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-[#f7f3f4] overflow-hidden relative">
       {/* Subtle header */}
       <div className="flex items-center justify-between px-5 pt-12 pb-2 z-10 relative">
         <p className="text-xs font-semibold text-[#bd7880]/70 italic">We swiped right... on skills.</p>
-        <span className="text-xs text-muted-foreground font-medium">{users.length - currentIndex} left</span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowInstantMatch(true)}
+            className="flex items-center gap-1 text-xs font-bold bg-yellow-400 text-[#4d0011] px-2.5 py-1 rounded-full shadow-sm hover:bg-yellow-300 transition-colors"
+          >
+            <Zap className="h-3 w-3 fill-current" />
+            Match Now
+          </button>
+          <span className="text-xs text-muted-foreground font-medium">{displayUsers.length - currentIndex} left</span>
+        </div>
+      </div>
+
+      {/* Mood + Combo filters */}
+      <div className="px-4 pb-2 flex items-center gap-2 overflow-x-auto scrollbar-hide flex-nowrap">
+        {MOODS.map(m => (
+          <button
+            key={m.id}
+            onClick={() => setMood(mood === m.id ? null : m.id)}
+            className={`shrink-0 text-[11px] font-semibold px-2.5 py-1 rounded-full border transition-all ${
+              mood === m.id
+                ? "bg-[#4d0011] text-white border-[#4d0011]"
+                : "bg-white/70 text-[#4d0011] border-[#bd7880]/40"
+            }`}
+          >
+            {m.label}
+          </button>
+        ))}
+        <button
+          onClick={() => setCombosOnly(!combosOnly)}
+          className={`shrink-0 text-[11px] font-semibold px-2.5 py-1 rounded-full border transition-all flex items-center gap-1 ${
+            combosOnly
+              ? "bg-[#102b1f] text-white border-[#102b1f]"
+              : "bg-white/70 text-[#102b1f] border-[#102b1f]/30"
+          }`}
+        >
+          🔗 Combos
+        </button>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 pb-32 relative">
@@ -288,9 +377,19 @@ export default function Explore() {
               {currentUser.isNew && (
                 <ContextBadge label="New User" color="bg-[#bd7880]/90 text-white" />
               )}
-              {currentUser.overlappingSkills.length >= 2 && (
-                <ContextBadge label="High Demand" color="bg-[#4d0011]/90 text-[#ffd9d9]" />
+              {demandData && currentUser.skillsOffered.some(s =>
+                demandData.find(d => d.skill.toLowerCase() === s.toLowerCase())?.level === "high"
+              ) && (
+                <ContextBadge label="🔥 High Demand" color="bg-[#4d0011]/90 text-[#ffd9d9]" />
               )}
+              {currentUser.credibilityScore >= 4.5 && currentUser.exchangeCount >= 5 && (
+                <ContextBadge label="👑 Elite" color="bg-yellow-400/90 text-[#4d0011]" />
+              )}
+              {me && (() => {
+                const myWanted = (me.skillsWanted ?? []).map(s => s.toLowerCase());
+                const comboCount = currentUser.skillsOffered.filter(s => myWanted.includes(s.toLowerCase())).length;
+                return comboCount >= 2 ? <ContextBadge label={`🔗 ${comboCount} Skills Match`} color="bg-[#102b1f]/90 text-[#ffd9d9]" /> : null;
+              })()}
             </div>
 
             {/* Match score badge */}
@@ -325,7 +424,7 @@ export default function Explore() {
               <p className="text-[#bd7880] text-[10px] font-bold uppercase tracking-widest mb-1.5">Teaches</p>
               <div className="flex flex-wrap gap-1.5">
                 {currentUser.skillsOffered.slice(0, 4).map(s => (
-                  <SkillPill key={s} label={s} variant="offered" />
+                  <SkillPill key={s} label={s} variant="offered" demand={demandData} />
                 ))}
               </div>
             </div>
@@ -334,7 +433,7 @@ export default function Explore() {
               <p className="text-[#ffd9d9]/40 text-[10px] font-bold uppercase tracking-widest mb-1.5">Wants</p>
               <div className="flex flex-wrap gap-1.5">
                 {currentUser.skillsWanted.slice(0, 4).map(s => (
-                  <SkillPill key={s} label={s} variant="wanted" />
+                  <SkillPill key={s} label={s} variant="wanted" demand={demandData} />
                 ))}
               </div>
             </div>
@@ -476,6 +575,8 @@ export default function Explore() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <InstantMatchModal open={showInstantMatch} onClose={() => setShowInstantMatch(false)} />
     </div>
   );
 }
