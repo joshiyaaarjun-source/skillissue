@@ -17,6 +17,7 @@ import Chat from "@/pages/Chat";
 import Quiz from "@/pages/Quiz";
 import Upload from "@/pages/Upload";
 import LearningPaths from "@/pages/LearningPaths";
+import VideoSession from "@/pages/VideoSession";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ function Router() {
       <Route path="/quiz" component={Quiz} />
       <Route path="/upload" component={Upload} />
       <Route path="/learning-paths" component={LearningPaths} />
+      <Route path="/session/:matchId" component={VideoSession} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -379,6 +379,36 @@ export interface SkillVerification {
   status?: SkillVerificationStatus;
 }
 
+export interface StartSessionBody {
+  matchId: string;
+  exchangeId?: string;
+}
+
+export type SessionStatus = (typeof SessionStatus)[keyof typeof SessionStatus];
+
+export const SessionStatus = {
+  active: "active",
+  completed: "completed",
+  cancelled: "cancelled",
+} as const;
+
+export interface Session {
+  id: string;
+  matchId: string;
+  partnerName: string;
+  partnerAvatar: string;
+  status: SessionStatus;
+  durationSeconds: number;
+  creditsEarned: number;
+  startedAt: string;
+  endedAt?: string;
+}
+
+export interface SessionFeedbackBody {
+  rating: number;
+  review: string;
+}
+
 export interface SkillCoachFeedback {
   strengths: string[];
   weaknesses: string[];
@@ -418,3 +448,7 @@ export interface LearningPath {
   totalXp: number;
   completedSteps: number;
 }
+
+export type SubmitSessionFeedback200 = {
+  success: boolean;
+};

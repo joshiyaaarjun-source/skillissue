@@ -1,0 +1,194 @@
+You are a senior full-stack engineer, product designer, and system architect.
+
+Build a complete, production-grade, mobile-first web application called Skill Issu.
+Tagline: "We swiped right… on skills."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CRITICAL DIRECTIVE — IDEMPOTENCY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Before implementing any feature, check whether it already exists in the codebase.
+If it does — even partially — skip to the next unimplemented feature. Do NOT
+re-implement, refactor, or rename existing working features unless explicitly told to.
+Treat the feature list as an ordered checklist: find the first unchecked item and build it.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TECH STACK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Frontend: React (functional components, hooks)
+- Backend/DB: Firebase (Auth, Firestore, Storage, Cloud Functions)
+- AI: Claude API (claude-sonnet-4-20250514)
+- Styling: Tailwind CSS
+- Video: WebRTC
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DESIGN SYSTEM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Theme: Dark luxury UI
+- Accent color: Blush rose (#bd7880)
+- Typography: Serif headings, clean sans-serif body
+- Layout: Card-based, generous whitespace
+- Tone: Premium, intelligent, emotionally engaging — Bloomberg meets Tinder meets LinkedIn
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CORE CONCEPT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Skill Issu is a peer-to-peer skill exchange platform.
+- Users teach skills → earn credits
+- Users learn skills → spend credits
+- No real money involved
+- All exchanges logged in an immutable ledger
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FEATURE LIST (implement in order — skip any that already exist)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[ 1 ] AUTHENTICATION
+  - Google Sign-In via Firebase Auth
+  - Persistent session + secure logout
+  - Routing: unauthenticated → Login | new user → Onboarding | existing → Dashboard
+
+[ 2 ] ONBOARDING FLOW (6 steps, player-card UI)
+  1. Name
+  2. Bio
+  3. Skills to teach (chips, custom input, verification flag)
+  4. Skills to learn
+  5. Availability
+  6. Domain + personality questions (structured/chill, fast/deep, etc.)
+
+[ 3 ] SKILL VERIFICATION
+  - Layer 1 (Quiz): 3 Claude-generated questions; ≥2 correct → "Partially Verified"
+  - Layer 2 (Documents): drag-drop upload to Firebase Storage → "Fully Verified ✓"
+
+[ 4 ] AI SKILL COACH
+  - Post-session AI feedback card on Dashboard
+  - Displays strengths, weaknesses, and suggested improvements
+  - Label: "Your Skill Coach says…"
+
+[ 5 ] SMART LEARNING PATHS
+  - User picks a goal
+  - Claude generates a structured roadmap
+  - Rendered as a Duolingo-style progress path
+
+[ 6 ] VIDEO SESSION SYSTEM
+  - In-app WebRTC video call
+  - Session timer + End Session button
+  - On end: trigger credit transfer + feedback prompt
+
+[ 7 ] SESSION NOTES + WHITEBOARD
+  - Shared text notes + drawing canvas
+  - Persisted to Firestore at /sessions/{sessionId}
+
+[ 8 ] DISCOVERY — SWIPE SYSTEM
+  - Tinder-style swipe cards
+  - AI-ranked match ordering
+  - Each card shows: skill chips, credibility score, badges
+  - "Why this match?" explanation text
+  - Personality compatibility badge
+
+[ 9 ] SKILL DEMAND INDEX
+  - Each skill tagged with demand level: 🔥 High | 📈 Rising | 🧊 Low
+  - Sourced from exchange frequency data
+
+[ 10 ] MATCH SYSTEM
+  - Mutual like + skill compatibility → match created
+  - Match modal with tagline: "We swiped right… on skills."
+
+[ 11 ] CHAT SYSTEM
+  - Real-time messaging via Firestore
+  - Profanity/tone filter
+  - "Professional tone" banner shown on first open
+
+[ 12 ] CREDIT SYSTEM
+  - Starting balance: 20 credits
+  - Teach a session: +10 | Learn a session: −5
+  - Quiz completion bonus included
+
+[ 13 ] SKILL EXCHANGE FLOW
+  - Proposal system (send/accept/decline)
+  - Exchange statuses: Pending → Ongoing → Completed
+
+[ 14 ] FEEDBACK & RATINGS
+  - Post-session star rating + text review
+  - Updates user credibility score
+
+[ 15 ] GAMIFICATION
+  - XP + level system
+  - Daily streaks
+  - Badges for milestones
+  - Leaderboard
+
+[ 16 ] SKILL BATTLES
+  - Timed head-to-head challenges
+  - Community voting determines winner
+  - Rewards: credits + exclusive badge
+
+[ 17 ] REFERRAL SYSTEM
+  - Unique invite link per user
+  - Successful referral → credit reward for both parties
+
+[ 18 ] ANTI-GHOSTING SYSTEM
+  - Nudges sent to users inactive in active exchanges
+  - Repeated ghosting reduces discovery visibility
+
+[ 19 ] TRUST & SAFETY
+  - Report + block functionality
+  - AI-assisted moderation queue
+
+[ 20 ] MICRO-LESSONS FEED
+  - Users post short educational content
+  - Scrollable feed, sorted by relevance
+
+[ 21 ] ANALYTICS DASHBOARD
+  - Hours taught/learned
+  - Skill growth chart
+  - Performance trend insights
+
+[ 22 ] PORTFOLIO MODE
+  - Public profile URL
+  - Displays skills, proof uploads, and received reviews
+
+[ 23 ] INSTANT MATCH MODE
+  - Filter for users marked "Ready now"
+  - One-tap session initiation
+
+[ 24 ] MOOD-BASED MATCHING
+  - Pre-session mood selector: Focused / Casual / Explorative
+  - Influences match recommendations
+
+[ 25 ] SKILL COMBOS
+  - Detect complementary skill sets
+  - Suggest career path unlocked by the combination
+
+[ 26 ] ELITE VERIFIED BADGE
+  - Awarded to users meeting high trust/quality thresholds
+  - Displayed prominently on cards and profiles
+
+[ 27 ] SKILL TIMELINE
+  - Visual, chronological history of all exchanges
+  - Milestones highlighted
+
+[ 28 ] NOTIFICATIONS
+  - In-app + push notifications
+  - Witty, intelligent tone consistent with brand voice
+
+[ 29 ] DASHBOARD
+  - Credit balance
+  - Active matches + session history
+  - Learning goal progress
+  - AI Coach card
+
+[ 30 ] IMMUTABLE LEDGER
+  - All session events written to append-only Firestore collection
+  - No edits or deletes permitted — enforced via Security Rules
+
+[ 31 ] FEATURE FLAG SYSTEM
+  - Config-driven toggles to enable/disable any feature dynamically
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUALITY STANDARDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Every feature must feel intentional, premium, and emotionally engaging
+- No placeholder UI — if a component is shown, it must be functional
+- All AI calls must include proper loading states and graceful error handling
+- Firestore Security Rules must be explicitly defined for every collection
+- The user must feel they belong to an elite, intelligent, evolving network

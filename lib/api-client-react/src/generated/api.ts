@@ -36,9 +36,13 @@ import type {
   Quiz,
   QuizResult,
   SendMessageBody,
+  Session,
+  SessionFeedbackBody,
   SkillCoachFeedback,
   SkillVerification,
+  StartSessionBody,
   SubmitQuizBody,
+  SubmitSessionFeedback200,
   SwipeBody,
   SwipeResult,
   UploadDocBody,
@@ -1510,6 +1514,341 @@ export function useGetChatList<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getGetChatListQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Start a new video session for a match
+ */
+export const getStartSessionUrl = () => {
+  return `/api/sessions/start`;
+};
+
+export const startSession = async (
+  startSessionBody: StartSessionBody,
+  options?: RequestInit,
+): Promise<Session> => {
+  return customFetch<Session>(getStartSessionUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(startSessionBody),
+  });
+};
+
+export const getStartSessionMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof startSession>>,
+    TError,
+    { data: BodyType<StartSessionBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof startSession>>,
+  TError,
+  { data: BodyType<StartSessionBody> },
+  TContext
+> => {
+  const mutationKey = ["startSession"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof startSession>>,
+    { data: BodyType<StartSessionBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return startSession(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type StartSessionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof startSession>>
+>;
+export type StartSessionMutationBody = BodyType<StartSessionBody>;
+export type StartSessionMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Start a new video session for a match
+ */
+export const useStartSession = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof startSession>>,
+    TError,
+    { data: BodyType<StartSessionBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof startSession>>,
+  TError,
+  { data: BodyType<StartSessionBody> },
+  TContext
+> => {
+  return useMutation(getStartSessionMutationOptions(options));
+};
+
+/**
+ * @summary End a video session and trigger credit transfer
+ */
+export const getEndSessionUrl = (sessionId: string) => {
+  return `/api/sessions/${sessionId}/end`;
+};
+
+export const endSession = async (
+  sessionId: string,
+  options?: RequestInit,
+): Promise<Session> => {
+  return customFetch<Session>(getEndSessionUrl(sessionId), {
+    ...options,
+    method: "POST",
+  });
+};
+
+export const getEndSessionMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof endSession>>,
+    TError,
+    { sessionId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof endSession>>,
+  TError,
+  { sessionId: string },
+  TContext
+> => {
+  const mutationKey = ["endSession"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof endSession>>,
+    { sessionId: string }
+  > = (props) => {
+    const { sessionId } = props ?? {};
+
+    return endSession(sessionId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type EndSessionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof endSession>>
+>;
+
+export type EndSessionMutationError = ErrorType<unknown>;
+
+/**
+ * @summary End a video session and trigger credit transfer
+ */
+export const useEndSession = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof endSession>>,
+    TError,
+    { sessionId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof endSession>>,
+  TError,
+  { sessionId: string },
+  TContext
+> => {
+  return useMutation(getEndSessionMutationOptions(options));
+};
+
+/**
+ * @summary Submit post-session rating and review
+ */
+export const getSubmitSessionFeedbackUrl = (sessionId: string) => {
+  return `/api/sessions/${sessionId}/feedback`;
+};
+
+export const submitSessionFeedback = async (
+  sessionId: string,
+  sessionFeedbackBody: SessionFeedbackBody,
+  options?: RequestInit,
+): Promise<SubmitSessionFeedback200> => {
+  return customFetch<SubmitSessionFeedback200>(
+    getSubmitSessionFeedbackUrl(sessionId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(sessionFeedbackBody),
+    },
+  );
+};
+
+export const getSubmitSessionFeedbackMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitSessionFeedback>>,
+    TError,
+    { sessionId: string; data: BodyType<SessionFeedbackBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof submitSessionFeedback>>,
+  TError,
+  { sessionId: string; data: BodyType<SessionFeedbackBody> },
+  TContext
+> => {
+  const mutationKey = ["submitSessionFeedback"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof submitSessionFeedback>>,
+    { sessionId: string; data: BodyType<SessionFeedbackBody> }
+  > = (props) => {
+    const { sessionId, data } = props ?? {};
+
+    return submitSessionFeedback(sessionId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SubmitSessionFeedbackMutationResult = NonNullable<
+  Awaited<ReturnType<typeof submitSessionFeedback>>
+>;
+export type SubmitSessionFeedbackMutationBody = BodyType<SessionFeedbackBody>;
+export type SubmitSessionFeedbackMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Submit post-session rating and review
+ */
+export const useSubmitSessionFeedback = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitSessionFeedback>>,
+    TError,
+    { sessionId: string; data: BodyType<SessionFeedbackBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof submitSessionFeedback>>,
+  TError,
+  { sessionId: string; data: BodyType<SessionFeedbackBody> },
+  TContext
+> => {
+  return useMutation(getSubmitSessionFeedbackMutationOptions(options));
+};
+
+/**
+ * @summary Get past sessions for current user
+ */
+export const getGetSessionHistoryUrl = () => {
+  return `/api/sessions/history`;
+};
+
+export const getSessionHistory = async (
+  options?: RequestInit,
+): Promise<Session[]> => {
+  return customFetch<Session[]>(getGetSessionHistoryUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetSessionHistoryQueryKey = () => {
+  return [`/api/sessions/history`] as const;
+};
+
+export const getGetSessionHistoryQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSessionHistory>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getSessionHistory>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetSessionHistoryQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getSessionHistory>>
+  > = ({ signal }) => getSessionHistory({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSessionHistory>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetSessionHistoryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSessionHistory>>
+>;
+export type GetSessionHistoryQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get past sessions for current user
+ */
+
+export function useGetSessionHistory<
+  TData = Awaited<ReturnType<typeof getSessionHistory>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getSessionHistory>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetSessionHistoryQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

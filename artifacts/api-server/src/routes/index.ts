@@ -14,6 +14,7 @@ import chatRouter from "./chat";
 import verificationRouter from "./verification";
 import onboardingRouter from "./onboarding";
 import aiRouter from "./ai";
+import sessionsRouter from "./sessions";
 
 const router: IRouter = Router();
 
@@ -32,5 +33,6 @@ router.use(chatRouter);
 router.use(verificationRouter);
 router.use(onboardingRouter);
 router.use(aiRouter);
+router.use(sessionsRouter);
 
 export default router;

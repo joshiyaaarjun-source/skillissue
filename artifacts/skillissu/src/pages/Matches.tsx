@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { MessageCircle, Handshake, Star, Clock, ShieldCheck, TrendingUp, Users, Coins } from "lucide-react";
+import { MessageCircle, Handshake, Star, Clock, ShieldCheck, TrendingUp, Users, Coins, Video } from "lucide-react";
 import {
   useGetMatches, getGetMatchesQueryKey,
   useGetExchanges, getGetExchangesQueryKey,
   useGetCreditBalance, getGetCreditBalanceQueryKey,
 } from "@workspace/api-client-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import BottomNav from "@/components/BottomNav";
 import ExchangeModal from "@/components/ExchangeModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -30,6 +30,7 @@ function StatCard({ icon: Icon, value, label, color }: { icon: any; value: strin
 }
 
 export default function Matches() {
+  const [, navigate] = useLocation();
   const { data: matches, isLoading: matchesLoading } = useGetMatches({ query: { queryKey: getGetMatchesQueryKey() } });
   const { data: exchanges, isLoading: exchangesLoading } = useGetExchanges({ query: { queryKey: getGetExchangesQueryKey() } });
   const { data: credits } = useGetCreditBalance({ query: { queryKey: getGetCreditBalanceQueryKey() } });
@@ -183,23 +184,32 @@ export default function Matches() {
                       </div>
 
                       {/* Action buttons */}
-                      <div className="grid grid-cols-2 gap-2">
-                        <Link href={`/chat/${match.id}`} className="block">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full border-[#bd7880]/40 text-[#4d0011] hover:bg-[#ffd9d9]/40 font-bold rounded-xl h-9"
-                          >
-                            <MessageCircle size={14} className="mr-1.5" /> Message
-                          </Button>
-                        </Link>
+                      <div className="space-y-2">
                         <Button
                           size="sm"
-                          className="w-full bg-[#4d0011] text-white hover:bg-[#4d0011]/85 font-bold rounded-xl h-9"
-                          onClick={() => { setSelectedPartner(match.matchedUser); setSelectedMatchId(match.id); }}
+                          className="w-full bg-[#102b1f] hover:bg-[#102b1f]/85 text-white font-bold rounded-xl h-9 gap-2"
+                          onClick={() => navigate(`/session/${match.id}`)}
                         >
-                          <Handshake size={14} className="mr-1.5" /> Propose Exchange
+                          <Video size={14} /> Start Session
                         </Button>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Link href={`/chat/${match.id}`} className="block">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full border-[#bd7880]/40 text-[#4d0011] hover:bg-[#ffd9d9]/40 font-bold rounded-xl h-9"
+                            >
+                              <MessageCircle size={14} className="mr-1.5" /> Message
+                            </Button>
+                          </Link>
+                          <Button
+                            size="sm"
+                            className="w-full bg-[#4d0011] text-white hover:bg-[#4d0011]/85 font-bold rounded-xl h-9"
+                            onClick={() => { setSelectedPartner(match.matchedUser); setSelectedMatchId(match.id); }}
+                          >
+                            <Handshake size={14} className="mr-1.5" /> Propose
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </motion.div>

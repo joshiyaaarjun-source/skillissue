@@ -465,6 +465,79 @@ export const GetChatListResponseItem = zod.object({
 export const GetChatListResponse = zod.array(GetChatListResponseItem);
 
 /**
+ * @summary Start a new video session for a match
+ */
+export const StartSessionBody = zod.object({
+  matchId: zod.string(),
+  exchangeId: zod.string().optional(),
+});
+
+export const StartSessionResponse = zod.object({
+  id: zod.string(),
+  matchId: zod.string(),
+  partnerName: zod.string(),
+  partnerAvatar: zod.string(),
+  status: zod.enum(["active", "completed", "cancelled"]),
+  durationSeconds: zod.number(),
+  creditsEarned: zod.number(),
+  startedAt: zod.string(),
+  endedAt: zod.string().optional(),
+});
+
+/**
+ * @summary End a video session and trigger credit transfer
+ */
+export const EndSessionParams = zod.object({
+  sessionId: zod.coerce.string(),
+});
+
+export const EndSessionResponse = zod.object({
+  id: zod.string(),
+  matchId: zod.string(),
+  partnerName: zod.string(),
+  partnerAvatar: zod.string(),
+  status: zod.enum(["active", "completed", "cancelled"]),
+  durationSeconds: zod.number(),
+  creditsEarned: zod.number(),
+  startedAt: zod.string(),
+  endedAt: zod.string().optional(),
+});
+
+/**
+ * @summary Submit post-session rating and review
+ */
+export const SubmitSessionFeedbackParams = zod.object({
+  sessionId: zod.coerce.string(),
+});
+
+export const SubmitSessionFeedbackBody = zod.object({
+  rating: zod.number(),
+  review: zod.string(),
+});
+
+export const SubmitSessionFeedbackResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Get past sessions for current user
+ */
+export const GetSessionHistoryResponseItem = zod.object({
+  id: zod.string(),
+  matchId: zod.string(),
+  partnerName: zod.string(),
+  partnerAvatar: zod.string(),
+  status: zod.enum(["active", "completed", "cancelled"]),
+  durationSeconds: zod.number(),
+  creditsEarned: zod.number(),
+  startedAt: zod.string(),
+  endedAt: zod.string().optional(),
+});
+export const GetSessionHistoryResponse = zod.array(
+  GetSessionHistoryResponseItem,
+);
+
+/**
  * @summary Get AI skill coach feedback based on recent exchanges
  */
 export const GetSkillCoachResponse = zod.object({

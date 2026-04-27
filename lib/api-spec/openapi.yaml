@@ -38,6 +38,8 @@ tags:
     description: Skill verification via quiz and documents
   - name: ai
     description: AI-powered coaching and learning paths
+  - name: sessions
+    description: Video sessions and post-session feedback
 
 paths:
   /healthz:
@@ -346,6 +348,89 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ChatSummary"
+
+  /sessions/start:
+    post:
+      operationId: startSession
+      tags: [sessions]
+      summary: Start a new video session for a match
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartSessionBody"
+      responses:
+        "200":
+          description: Session started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+
+  /sessions/{sessionId}/end:
+    post:
+      operationId: endSession
+      tags: [sessions]
+      summary: End a video session and trigger credit transfer
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Session ended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+
+  /sessions/{sessionId}/feedback:
+    post:
+      operationId: submitSessionFeedback
+      tags: [sessions]
+      summary: Submit post-session rating and review
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionFeedbackBody"
+      responses:
+        "200":
+          description: Feedback submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required:
+                  - success
+
+  /sessions/history:
+    get:
+      operationId: getSessionHistory
+      tags: [sessions]
+      summary: Get past sessions for current user
+      responses:
+        "200":
+          description: List of sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Session"
 
   /ai/skill-coach:
     get:
@@ -1165,6 +1250,59 @@ components:
         - skill
         - quizPassed
         - docUploaded
+
+    StartSessionBody:
+      type: object
+      properties:
+        matchId:
+          type: string
+        exchangeId:
+          type: string
+      required:
+        - matchId
+
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+        matchId:
+          type: string
+        partnerName:
+          type: string
+        partnerAvatar:
+          type: string
+        status:
+          type: string
+          enum: [active, completed, cancelled]
+        durationSeconds:
+          type: number
+        creditsEarned:
+          type: number
+        startedAt:
+          type: string
+        endedAt:
+          type: string
+      required:
+        - id
+        - matchId
+        - partnerName
+        - partnerAvatar
+        - status
+        - durationSeconds
+        - creditsEarned
+        - startedAt
+
+    SessionFeedbackBody:
+      type: object
+      properties:
+        rating:
+          type: number
+        review:
+          type: string
+      required:
+        - rating
+        - review
 
     SkillCoachFeedback:
       type: object
