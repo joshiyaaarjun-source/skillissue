@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Star, Flame, Zap, ArrowRight, BookOpen, User as UserIcon, Brain, ChevronDown, ChevronUp, CheckCircle2, Lightbulb, AlertCircle, RefreshCw, Map, Swords, Bell, Crown, Flag } from "lucide-react";
+import { motion, type Variants } from "framer-motion";
+import { Star, Flame, Zap, ArrowRight, BookOpen, User as UserIcon, Brain, ChevronDown, ChevronUp, CheckCircle2, Lightbulb, AlertCircle, RefreshCw, Map, Swords, Bell, Crown, Flag, Play, Gavel, Users, BookMarked, Sparkles, Radio, Dna } from "lucide-react";
 import { useGetMe, getGetMeQueryKey, useGetNudges, getGetNudgesQueryKey, useGetExchanges, getGetExchangesQueryKey, useGetSkillCoach, getGetSkillCoachQueryKey, useGetNotifications, getGetNotificationsQueryKey } from "@workspace/api-client-react";
 import { Link } from "wouter";
+import ColdStartWidget from "@/components/ColdStartWidget";
 import BottomNav from "@/components/BottomNav";
 import FakeNotificationBanner from "@/components/FakeNotificationBanner";
 import CreditCounter from "@/components/CreditCounter";
@@ -16,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -24,7 +25,7 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };
@@ -245,6 +246,72 @@ export default function Dashboard() {
               <ArrowRight className="h-5 w-5 text-[#ffd9d9]/60" />
             </div>
           </Link>
+        </motion.div>
+
+        {/* Cold Start Challenge */}
+        <motion.div variants={itemVariants}>
+          <ColdStartWidget />
+        </motion.div>
+
+        {/* New Features Grid */}
+        <motion.div variants={itemVariants}>
+          <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-widest mb-3 px-1">Explore More</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <Link href="/reels">
+              <div className="bg-[#1a0a0f] text-white rounded-2xl p-4 flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+                <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
+                  <Play className="h-4 w-4 text-[#ffd9d9] fill-current" />
+                </div>
+                <p className="font-bold text-sm leading-none">Skill Reels</p>
+                <p className="text-[10px] text-white/50 leading-snug">Short skill demos</p>
+              </div>
+            </Link>
+            <Link href="/auctions">
+              <div className="bg-[#4d0011] text-white rounded-2xl p-4 flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+                <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
+                  <Gavel className="h-4 w-4 text-[#ffd9d9]" />
+                </div>
+                <p className="font-bold text-sm leading-none">Auctions</p>
+                <p className="text-[10px] text-white/50 leading-snug">Bid for sessions</p>
+              </div>
+            </Link>
+            <Link href="/study-rooms">
+              <div className="bg-[#102b1f] text-white rounded-2xl p-4 flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+                <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
+                  <Users className="h-4 w-4 text-white" />
+                </div>
+                <p className="font-bold text-sm leading-none">Study Rooms</p>
+                <p className="text-[10px] text-white/50 leading-snug">Group sprints</p>
+              </div>
+            </Link>
+            <Link href="/capsules">
+              <div className="bg-[#bd7880] text-white rounded-2xl p-4 flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+                <div className="w-8 h-8 bg-white/15 rounded-xl flex items-center justify-center">
+                  <BookMarked className="h-4 w-4 text-white" />
+                </div>
+                <p className="font-bold text-sm leading-none">Capsules</p>
+                <p className="text-[10px] text-white/60 leading-snug">Mini-courses</p>
+              </div>
+            </Link>
+            <Link href="/live-drops">
+              <div className="bg-gradient-to-br from-[#071a12] to-[#102b1f] text-white rounded-2xl p-4 flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity relative overflow-hidden">
+                <div className="w-8 h-8 bg-green-500/20 rounded-xl flex items-center justify-center">
+                  <Radio className="h-4 w-4 text-green-400" />
+                </div>
+                <p className="font-bold text-sm leading-none">Live Drops</p>
+                <p className="text-[10px] text-white/50 leading-snug">Unplanned sessions</p>
+              </div>
+            </Link>
+            <Link href="/wrapped">
+              <div className="bg-gradient-to-br from-[#4d0011] to-[#2a0044] text-white rounded-2xl p-4 flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+                <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
+                  <Sparkles className="h-4 w-4 text-yellow-300" />
+                </div>
+                <p className="font-bold text-sm leading-none">Skill Wrapped</p>
+                <p className="text-[10px] text-white/50 leading-snug">Your month in stats</p>
+              </div>
+            </Link>
+          </div>
         </motion.div>
 
         {/* Skill Battles CTA */}

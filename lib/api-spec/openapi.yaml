@@ -714,6 +714,482 @@ paths:
                 items:
                   $ref: "#/components/schemas/SkillVerification"
 
+
+  /reels:
+    get:
+      operationId: getReels
+      tags: [reels]
+      summary: Get skill reels feed
+      responses:
+        "200":
+          description: List of reels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Reel"
+    post:
+      operationId: createReel
+      tags: [reels]
+      summary: Create a new reel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReelBody"
+      responses:
+        "200":
+          description: Created reel
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reel"
+
+  /reels/{id}/react:
+    post:
+      operationId: reactToReel
+      tags: [reels]
+      summary: React to a reel
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReelReactionBody"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+
+  /auctions:
+    get:
+      operationId: getAuctions
+      tags: [auctions]
+      summary: Get active auctions
+      responses:
+        "200":
+          description: List of auctions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Auction"
+    post:
+      operationId: createAuction
+      tags: [auctions]
+      summary: Create an auction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAuctionBody"
+      responses:
+        "200":
+          description: Created auction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Auction"
+
+  /auctions/{id}/bid:
+    post:
+      operationId: placeBid
+      tags: [auctions]
+      summary: Place a bid on an auction
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BidBody"
+      responses:
+        "200":
+          description: Bid placed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  newBid:
+                    type: number
+                required: [success, newBid]
+
+  /study-rooms:
+    get:
+      operationId: getStudyRooms
+      tags: [studyRooms]
+      summary: Get all study rooms
+      responses:
+        "200":
+          description: List of study rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StudyRoom"
+    post:
+      operationId: createStudyRoom
+      tags: [studyRooms]
+      summary: Create a study room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStudyRoomBody"
+      responses:
+        "200":
+          description: Created room
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudyRoom"
+
+  /study-rooms/{id}/join:
+    post:
+      operationId: joinStudyRoom
+      tags: [studyRooms]
+      summary: Join a study room
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Joined
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+
+  /study-rooms/{id}/leave:
+    post:
+      operationId: leaveStudyRoom
+      tags: [studyRooms]
+      summary: Leave a study room
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Left
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+
+  /study-rooms/{id}/pins:
+    get:
+      operationId: getStudyRoomPins
+      tags: [studyRooms]
+      summary: Get pins for a study room
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of pins
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StudyRoomPin"
+    post:
+      operationId: addStudyRoomPin
+      tags: [studyRooms]
+      summary: Add a pin to a study room
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddPinBody"
+      responses:
+        "200":
+          description: Created pin
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudyRoomPin"
+
+  /skill-dna:
+    get:
+      operationId: getSkillDna
+      tags: [skillDna]
+      summary: Get skill DNA for current user
+      responses:
+        "200":
+          description: Skill DNA data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillDna"
+
+  /challenges/today:
+    get:
+      operationId: getTodayChallenge
+      tags: [challenges]
+      summary: Get today's cold-start challenge
+      responses:
+        "200":
+          description: Today's challenge
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChallengeResponse"
+
+  /challenges/{id}/complete:
+    post:
+      operationId: completeChallenge
+      tags: [challenges]
+      summary: Mark a challenge as completed
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Challenge completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  creditsEarned:
+                    type: number
+                required: [success, creditsEarned]
+
+  /capsules:
+    get:
+      operationId: getCapsules
+      tags: [capsules]
+      summary: Get all skill capsules
+      responses:
+        "200":
+          description: List of capsules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Capsule"
+
+  /capsules/{id}/enroll:
+    post:
+      operationId: enrollInCapsule
+      tags: [capsules]
+      summary: Enroll in a skill capsule
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Enrolled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+
+  /capsules/{id}/lessons:
+    get:
+      operationId: getCapsuleLessons
+      tags: [capsules]
+      summary: Get lessons for a capsule
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lessons
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapsuleLessonsResponse"
+
+  /capsules/{id}/lessons/{lessonId}/complete:
+    post:
+      operationId: completeCapsuleLesson
+      tags: [capsules]
+      summary: Complete a capsule lesson
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: lessonId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lesson completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  lessonsCompleted:
+                    type: number
+                required: [success, lessonsCompleted]
+
+  /vouches/user/{userId}:
+    get:
+      operationId: getVouches
+      tags: [vouches]
+      summary: Get vouches for a user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of vouches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Vouch"
+
+  /vouches:
+    post:
+      operationId: createVouch
+      tags: [vouches]
+      summary: Vouch for a user's skill
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVouchBody"
+      responses:
+        "200":
+          description: Vouch created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  stakeAmount:
+                    type: number
+                required: [success, stakeAmount]
+
+  /live-drops:
+    get:
+      operationId: getLiveDrops
+      tags: [liveDrops]
+      summary: Get active live drops
+      responses:
+        "200":
+          description: List of live drops
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LiveDrop"
+    post:
+      operationId: createLiveDrop
+      tags: [liveDrops]
+      summary: Announce a live drop
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLiveDropBody"
+      responses:
+        "200":
+          description: Created live drop
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LiveDrop"
+
+  /wrapped:
+    get:
+      operationId: getWrapped
+      tags: [wrapped]
+      summary: Get monthly skill wrapped
+      responses:
+        "200":
+          description: Monthly wrapped data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillWrapped"
+
 components:
   schemas:
     HealthStatus:
@@ -1677,4 +2153,395 @@ components:
         - steps
         - createdAt
         - totalXp
-        - completedSteps
+
+    Reel:
+      type: object
+      properties:
+        id:
+          type: number
+        userId:
+          type: number
+        skillTag:
+          type: string
+        title:
+          type: string
+        thumbnailUrl:
+          type: string
+        duration:
+          type: number
+        reelScore:
+          type: number
+        authorName:
+          type: string
+        authorAvatar:
+          type: string
+        reactionCounts:
+          type: object
+          properties:
+            "\U0001F525":
+              type: number
+            "\U0001F914":
+              type: number
+            "\U0001F44F":
+              type: number
+          required: ["\U0001F525", "\U0001F914", "\U0001F44F"]
+        myReaction:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+      required: [id, userId, skillTag, title, thumbnailUrl, duration, reelScore, authorName, authorAvatar, reactionCounts, createdAt]
+
+    CreateReelBody:
+      type: object
+      properties:
+        skillTag:
+          type: string
+        title:
+          type: string
+        duration:
+          type: number
+      required: [skillTag, title]
+
+    ReelReactionBody:
+      type: object
+      properties:
+        reaction:
+          type: string
+      required: [reaction]
+
+    Auction:
+      type: object
+      properties:
+        id:
+          type: number
+        sellerId:
+          type: number
+        skillTag:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        reservePrice:
+          type: number
+        currentBid:
+          type: number
+        status:
+          type: string
+        endsAt:
+          type: string
+        sellerName:
+          type: string
+        sellerAvatar:
+          type: string
+        topBidderName:
+          type: string
+          nullable: true
+        myBid:
+          type: number
+          nullable: true
+        bidCount:
+          type: number
+      required: [id, sellerId, skillTag, title, description, reservePrice, currentBid, status, endsAt, sellerName, sellerAvatar, bidCount]
+
+    CreateAuctionBody:
+      type: object
+      properties:
+        skillTag:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        reservePrice:
+          type: number
+      required: [skillTag, title]
+
+    BidBody:
+      type: object
+      properties:
+        amount:
+          type: number
+      required: [amount]
+
+    StudyRoom:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        topic:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        maxMembers:
+          type: number
+        sprintDuration:
+          type: number
+        memberCount:
+          type: number
+        presentCount:
+          type: number
+        presentMembers:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+              name:
+                type: string
+              avatar:
+                type: string
+            required: [id, name, avatar]
+        isMember:
+          type: boolean
+      required: [id, name, topic, tags, maxMembers, sprintDuration, memberCount, presentCount, presentMembers, isMember]
+
+    CreateStudyRoomBody:
+      type: object
+      properties:
+        name:
+          type: string
+        topic:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+      required: [name, topic]
+
+    StudyRoomPin:
+      type: object
+      properties:
+        id:
+          type: number
+        roomId:
+          type: number
+        content:
+          type: string
+        pinType:
+          type: string
+        authorName:
+          type: string
+        authorAvatar:
+          type: string
+        createdAt:
+          type: string
+      required: [id, roomId, content, pinType, authorName, authorAvatar, createdAt]
+
+    AddPinBody:
+      type: object
+      properties:
+        content:
+          type: string
+        pinType:
+          type: string
+      required: [content]
+
+    SkillDna:
+      type: object
+      properties:
+        available:
+          type: boolean
+        depth:
+          type: number
+        breadth:
+          type: number
+        teaching:
+          type: number
+        speed:
+          type: number
+        curiosity:
+          type: number
+        message:
+          type: string
+      required: [available]
+
+    ColdStartChallenge:
+      type: object
+      properties:
+        id:
+          type: number
+        prompt:
+          type: string
+        skillContext:
+          type: string
+        completed:
+          type: boolean
+        creditsAwarded:
+          type: number
+      required: [id, prompt, skillContext, completed, creditsAwarded]
+
+    ChallengeResponse:
+      type: object
+      properties:
+        graduated:
+          type: boolean
+        completedCount:
+          type: number
+        challenge:
+          $ref: "#/components/schemas/ColdStartChallenge"
+      required: [completedCount]
+
+    Capsule:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        description:
+          type: string
+        skillTag:
+          type: string
+        difficulty:
+          type: string
+        coverEmoji:
+          type: string
+        enrollmentCost:
+          type: number
+        totalEnrollments:
+          type: number
+        avgRating:
+          type: number
+        creatorName:
+          type: string
+        creatorAvatar:
+          type: string
+        enrolled:
+          type: boolean
+        myProgress:
+          type: number
+      required: [id, title, description, skillTag, difficulty, coverEmoji, enrollmentCost, totalEnrollments, avgRating, creatorName, creatorAvatar, enrolled, myProgress]
+
+    CapsuleLesson:
+      type: object
+      properties:
+        id:
+          type: number
+        capsuleId:
+          type: number
+        title:
+          type: string
+        content:
+          type: string
+        order:
+          type: number
+        durationMinutes:
+          type: number
+      required: [id, capsuleId, title, content, order, durationMinutes]
+
+    CapsuleLessonsResponse:
+      type: object
+      properties:
+        lessons:
+          type: array
+          items:
+            $ref: "#/components/schemas/CapsuleLesson"
+        lessonsCompleted:
+          type: number
+      required: [lessons, lessonsCompleted]
+
+    Vouch:
+      type: object
+      properties:
+        id:
+          type: number
+        voucherId:
+          type: number
+        vouchedUserId:
+          type: number
+        skill:
+          type: string
+        stakeAmount:
+          type: number
+        status:
+          type: string
+        voucherName:
+          type: string
+        voucherAvatar:
+          type: string
+      required: [id, voucherId, vouchedUserId, skill, stakeAmount, status, voucherName, voucherAvatar]
+
+    CreateVouchBody:
+      type: object
+      properties:
+        vouchedUserId:
+          type: number
+        skill:
+          type: string
+      required: [vouchedUserId, skill]
+
+    LiveDrop:
+      type: object
+      properties:
+        id:
+          type: number
+        userId:
+          type: number
+        skillTag:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        startsInMinutes:
+          type: number
+        status:
+          type: string
+        minutesLeft:
+          type: number
+        hostName:
+          type: string
+        hostAvatar:
+          type: string
+        announcedAt:
+          type: string
+        expiresAt:
+          type: string
+      required: [id, userId, skillTag, title, description, startsInMinutes, status, minutesLeft, hostName, hostAvatar, announcedAt, expiresAt]
+
+    CreateLiveDropBody:
+      type: object
+      properties:
+        skillTag:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        startsInMinutes:
+          type: number
+      required: [skillTag, title]
+
+    SkillWrapped:
+      type: object
+      properties:
+        id:
+          type: number
+        userId:
+          type: number
+        month:
+          type: string
+        topSkillTaught:
+          type: string
+        topSkillLearned:
+          type: string
+        creditsEarned:
+          type: number
+        creditsSpent:
+          type: number
+        longestStreak:
+          type: number
+        newBadges:
+          type: number
+        totalExchanges:
+          type: number
+        aiCopy:
+          type: string
+      required: [id, userId, month, topSkillTaught, topSkillLearned, creditsEarned, creditsSpent, longestStreak, newBadges, totalExchanges, aiCopy]

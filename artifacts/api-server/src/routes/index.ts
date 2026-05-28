@@ -23,6 +23,16 @@ import lessonsRouter from "./lessons";
 import portfolioRouter from "./portfolio";
 import instantMatchRouter from "./instant-match";
 import featureFlagsRouter from "./feature-flags";
+import reelsRouter from "./reels";
+import auctionsRouter from "./auctions";
+import studyRoomsRouter from "./study-rooms";
+import skillDnaRouter from "./skill-dna";
+import challengesRouter from "./challenges";
+import voiceNotesRouter from "./voice-notes";
+import capsulesRouter from "./capsules";
+import vouchesRouter from "./vouches";
+import liveDropsRouter from "./live-drops";
+import wrappedRouter from "./wrapped";
 
 const router: IRouter = Router();
 
@@ -50,5 +60,15 @@ router.use(lessonsRouter);
 router.use(portfolioRouter);
 router.use(instantMatchRouter);
 router.use(featureFlagsRouter);
+router.use(reelsRouter);
+router.use(auctionsRouter);
+router.use(studyRoomsRouter);
+router.use(skillDnaRouter);
+router.use(challengesRouter);
+router.use(voiceNotesRouter);
+router.use(capsulesRouter);
+router.use(vouchesRouter);
+router.use(liveDropsRouter);
+router.use(wrappedRouter);
 
 export default router;

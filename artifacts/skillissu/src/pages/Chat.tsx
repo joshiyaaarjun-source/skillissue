@@ -4,12 +4,14 @@ import { useGetChatMessages, getGetChatMessagesQueryKey, useSendChatMessage } fr
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Send } from "lucide-react";
+import { ArrowLeft, Send, Mic } from "lucide-react";
+import VoiceNotes from "@/components/VoiceNotes";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function Chat() {
   const { matchId } = useParams();
   const queryClient = useQueryClient();
+  const [showVoiceNotes, setShowVoiceNotes] = useState(false);
   
   const { data: messages, isLoading } = useGetChatMessages(matchId || "", { 
     query: { queryKey: getGetChatMessagesQueryKey(matchId || ""), enabled: !!matchId } 
@@ -93,9 +95,25 @@ export default function Chat() {
         )}
       </div>
 
+      {/* Voice Notes panel */}
+      {showVoiceNotes && (
+        <div className="border-t border-border bg-white px-3 pt-2 pb-1">
+          <VoiceNotes />
+        </div>
+      )}
+
       {/* Input */}
       <div className="p-3 bg-white border-t border-border pb-safe">
         <form onSubmit={handleSend} className="flex items-center gap-2">
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className={`h-12 w-12 rounded-full shrink-0 ${showVoiceNotes ? "bg-[#ffd9d9] text-[#4d0011]" : "text-muted-foreground"}`}
+            onClick={() => setShowVoiceNotes(v => !v)}
+          >
+            <Mic className="h-5 w-5" />
+          </Button>
           <Input 
             value={text}
             onChange={(e) => setText(e.target.value)}

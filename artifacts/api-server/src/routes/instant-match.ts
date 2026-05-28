@@ -19,7 +19,7 @@ router.get("/instant-match", async (_req, res): Promise<void> => {
   );
 
   const existingSwipes = await db.select().from(swipesTable).where(eq(swipesTable.swiperId, DEMO_USER_ID));
-  const swipedUserIds = existingSwipes.map(s => s.swipeeId);
+  const swipedUserIds = existingSwipes.map(s => s.targetId);
 
   const excludeIds = [...new Set([DEMO_USER_ID, ...matchedUserIds, ...swipedUserIds])];
 

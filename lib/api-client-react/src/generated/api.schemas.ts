@@ -531,9 +531,250 @@ export interface LearningPath {
   steps: LearningPathStep[];
   createdAt: string;
   totalXp: number;
-  completedSteps: number;
+  completedSteps?: number;
+}
+
+export type ReelReactionCounts = {
+  "🔥": number;
+  "🤔": number;
+  "👏": number;
+};
+
+export interface Reel {
+  id: number;
+  userId: number;
+  skillTag: string;
+  title: string;
+  thumbnailUrl: string;
+  duration: number;
+  reelScore: number;
+  authorName: string;
+  authorAvatar: string;
+  reactionCounts: ReelReactionCounts;
+  myReaction?: string | null;
+  createdAt: string;
+}
+
+export interface CreateReelBody {
+  skillTag: string;
+  title: string;
+  duration?: number;
+}
+
+export interface ReelReactionBody {
+  reaction: string;
+}
+
+export interface Auction {
+  id: number;
+  sellerId: number;
+  skillTag: string;
+  title: string;
+  description: string;
+  reservePrice: number;
+  currentBid: number;
+  status: string;
+  endsAt: string;
+  sellerName: string;
+  sellerAvatar: string;
+  topBidderName?: string | null;
+  myBid?: number | null;
+  bidCount: number;
+}
+
+export interface CreateAuctionBody {
+  skillTag: string;
+  title: string;
+  description?: string;
+  reservePrice?: number;
+}
+
+export interface BidBody {
+  amount: number;
+}
+
+export type StudyRoomPresentMembersItem = {
+  id: number;
+  name: string;
+  avatar: string;
+};
+
+export interface StudyRoom {
+  id: number;
+  name: string;
+  topic: string;
+  tags: string[];
+  maxMembers: number;
+  sprintDuration: number;
+  memberCount: number;
+  presentCount: number;
+  presentMembers: StudyRoomPresentMembersItem[];
+  isMember: boolean;
+}
+
+export interface CreateStudyRoomBody {
+  name: string;
+  topic: string;
+  tags?: string[];
+}
+
+export interface StudyRoomPin {
+  id: number;
+  roomId: number;
+  content: string;
+  pinType: string;
+  authorName: string;
+  authorAvatar: string;
+  createdAt: string;
+}
+
+export interface AddPinBody {
+  content: string;
+  pinType?: string;
+}
+
+export interface SkillDna {
+  available: boolean;
+  depth?: number;
+  breadth?: number;
+  teaching?: number;
+  speed?: number;
+  curiosity?: number;
+  message?: string;
+}
+
+export interface ColdStartChallenge {
+  id: number;
+  prompt: string;
+  skillContext: string;
+  completed: boolean;
+  creditsAwarded: number;
+}
+
+export interface ChallengeResponse {
+  graduated?: boolean;
+  completedCount: number;
+  challenge?: ColdStartChallenge;
+}
+
+export interface Capsule {
+  id: number;
+  title: string;
+  description: string;
+  skillTag: string;
+  difficulty: string;
+  coverEmoji: string;
+  enrollmentCost: number;
+  totalEnrollments: number;
+  avgRating: number;
+  creatorName: string;
+  creatorAvatar: string;
+  enrolled: boolean;
+  myProgress: number;
+}
+
+export interface CapsuleLesson {
+  id: number;
+  capsuleId: number;
+  title: string;
+  content: string;
+  order: number;
+  durationMinutes: number;
+}
+
+export interface CapsuleLessonsResponse {
+  lessons: CapsuleLesson[];
+  lessonsCompleted: number;
+}
+
+export interface Vouch {
+  id: number;
+  voucherId: number;
+  vouchedUserId: number;
+  skill: string;
+  stakeAmount: number;
+  status: string;
+  voucherName: string;
+  voucherAvatar: string;
+}
+
+export interface CreateVouchBody {
+  vouchedUserId: number;
+  skill: string;
+}
+
+export interface LiveDrop {
+  id: number;
+  userId: number;
+  skillTag: string;
+  title: string;
+  description: string;
+  startsInMinutes: number;
+  status: string;
+  minutesLeft: number;
+  hostName: string;
+  hostAvatar: string;
+  announcedAt: string;
+  expiresAt: string;
+}
+
+export interface CreateLiveDropBody {
+  skillTag: string;
+  title: string;
+  description?: string;
+  startsInMinutes?: number;
+}
+
+export interface SkillWrapped {
+  id: number;
+  userId: number;
+  month: string;
+  topSkillTaught: string;
+  topSkillLearned: string;
+  creditsEarned: number;
+  creditsSpent: number;
+  longestStreak: number;
+  newBadges: number;
+  totalExchanges: number;
+  aiCopy: string;
 }
 
 export type SubmitSessionFeedback200 = {
   success: boolean;
+};
+
+export type ReactToReel200 = {
+  success: boolean;
+};
+
+export type PlaceBid200 = {
+  success: boolean;
+  newBid: number;
+};
+
+export type JoinStudyRoom200 = {
+  success: boolean;
+};
+
+export type LeaveStudyRoom200 = {
+  success: boolean;
+};
+
+export type CompleteChallenge200 = {
+  success: boolean;
+  creditsEarned: number;
+};
+
+export type EnrollInCapsule200 = {
+  success: boolean;
+};
+
+export type CompleteCapsuleLesson200 = {
+  success: boolean;
+  lessonsCompleted: number;
+};
+
+export type CreateVouch200 = {
+  success: boolean;
+  stakeAmount: number;
 };

@@ -13,5 +13,5 @@ export interface LearningPath {
   steps: LearningPathStep[];
   createdAt: string;
   totalXp: number;
-  completedSteps: number;
+  completedSteps?: number;
 }

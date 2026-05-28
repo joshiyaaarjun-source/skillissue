@@ -17,12 +17,29 @@ const DEFAULT_FLAGS = [
   { name: "anti_ghosting", description: "👻 Anti-ghosting nudge system", enabled: true, rolloutPercent: 100 },
   { name: "trust_safety", description: "🛡️ Trust & safety report system", enabled: true, rolloutPercent: 100 },
   { name: "ai_learning_paths", description: "🗺️ AI-generated personalized learning paths", enabled: true, rolloutPercent: 100 },
+  { name: "skill_reels", description: "🎬 TikTok-style short skill demo videos", enabled: true, rolloutPercent: 100 },
+  { name: "skill_auctions", description: "🔨 Bid credits to win exclusive 1-on-1 sessions", enabled: true, rolloutPercent: 100 },
+  { name: "study_rooms", description: "📚 Group study spaces with sprint timer & pinboard", enabled: true, rolloutPercent: 100 },
+  { name: "skill_dna", description: "🧬 Radar chart skill fingerprint profile", enabled: true, rolloutPercent: 100 },
+  { name: "cold_start_challenges", description: "🚀 Daily onboarding challenges for new users", enabled: true, rolloutPercent: 100 },
+  { name: "async_voice_notes", description: "🎙️ Async voice note messages in chat", enabled: true, rolloutPercent: 100 },
+  { name: "skill_capsules", description: "💊 3–5 lesson mini-courses from top teachers", enabled: true, rolloutPercent: 100 },
+  { name: "reputation_staking", description: "🛡️ Peer vouches with credits at stake", enabled: true, rolloutPercent: 100 },
+  { name: "live_drops", description: "🔴 Unplanned live sessions announced in real time", enabled: true, rolloutPercent: 100 },
+  { name: "skill_wrapped", description: "✨ Monthly AI-narrated skill stats story", enabled: true, rolloutPercent: 100 },
 ];
 
 async function seedFlagsIfEmpty() {
   const existing = await db.select().from(featureFlagsTable);
-  if (existing.length > 0) return;
-  await db.insert(featureFlagsTable).values(DEFAULT_FLAGS);
+  if (existing.length === 0) {
+    await db.insert(featureFlagsTable).values(DEFAULT_FLAGS);
+    return;
+  }
+  const existingNames = new Set(existing.map(f => f.name));
+  const missing = DEFAULT_FLAGS.filter(f => !existingNames.has(f.name));
+  if (missing.length > 0) {
+    await db.insert(featureFlagsTable).values(missing);
+  }
 }
 
 router.get("/flags", async (_req, res): Promise<void> => {

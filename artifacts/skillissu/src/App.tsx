@@ -22,6 +22,14 @@ import SkillBattles from "@/pages/SkillBattles";
 import MicroLessons from "@/pages/MicroLessons";
 import Notifications from "@/pages/Notifications";
 import FeatureFlags from "@/pages/FeatureFlags";
+import SkillReels from "@/pages/SkillReels";
+import Auctions from "@/pages/Auctions";
+import StudyRooms from "@/pages/StudyRooms";
+import SkillDna from "@/pages/SkillDna";
+import Capsules from "@/pages/Capsules";
+import SkillWrapped from "@/pages/SkillWrapped";
+import LiveDrops from "@/pages/LiveDrops";
+import Vouches from "@/pages/Vouches";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +54,15 @@ function Router() {
       <Route path="/lessons" component={MicroLessons} />
       <Route path="/notifications" component={Notifications} />
       <Route path="/flags" component={FeatureFlags} />
+      <Route path="/reels" component={SkillReels} />
+      <Route path="/auctions" component={Auctions} />
+      <Route path="/study-rooms" component={StudyRooms} />
+      <Route path="/skill-dna" component={SkillDna} />
+      <Route path="/capsules" component={Capsules} />
+      <Route path="/wrapped" component={SkillWrapped} />
+      <Route path="/live-drops" component={LiveDrops} />
+      <Route path="/vouches/:userId" component={({ params }) => <Vouches userId={params.userId} />} />
+      <Route path="/vouches" component={() => <Vouches />} />
       <Route component={NotFound} />
     </Switch>
   );

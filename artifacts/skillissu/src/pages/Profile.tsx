@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useGetMe, getGetMeQueryKey, useGetExchanges, getGetExchangesQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Star, CheckCircle, Upload, Copy, Check, Gift, Users, ShieldCheck as ShieldCheckIcon, Crown, ArrowRight, ArrowLeft } from "lucide-react";
+import { Star, CheckCircle, Upload, Copy, Check, Gift, Users, ShieldCheck as ShieldCheckIcon, Crown, ArrowRight, ArrowLeft, Dna, Shield } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -187,6 +187,28 @@ export default function Profile() {
               <p className="text-sm text-muted-foreground">No monthly goals set.</p>
             )}
           </div>
+        </div>
+
+        {/* Skill DNA & Vouches CTAs */}
+        <div className="grid grid-cols-2 gap-3">
+          <Link href="/skill-dna">
+            <div className="bg-[#4d0011] text-[#ffd9d9] rounded-2xl p-4 flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+              <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
+                <Dna className="h-4 w-4" />
+              </div>
+              <p className="font-bold text-sm leading-none">Skill DNA</p>
+              <p className="text-[10px] opacity-60 leading-snug">Your skill fingerprint</p>
+            </div>
+          </Link>
+          <Link href="/vouches">
+            <div className="bg-[#102b1f] text-white rounded-2xl p-4 flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+              <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
+                <Shield className="h-4 w-4" />
+              </div>
+              <p className="font-bold text-sm leading-none">Reputation</p>
+              <p className="text-[10px] opacity-60 leading-snug">Staked vouches</p>
+            </div>
+          </Link>
         </div>
 
         {/* Portfolio */}

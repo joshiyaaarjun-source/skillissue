@@ -742,7 +742,7 @@ export const GetLearningPathsResponseItem = zod.object({
   ),
   createdAt: zod.string(),
   totalXp: zod.number(),
-  completedSteps: zod.number(),
+  completedSteps: zod.number().optional(),
 });
 export const GetLearningPathsResponse = zod.array(GetLearningPathsResponseItem);
 
@@ -769,7 +769,7 @@ export const GenerateLearningPathResponse = zod.object({
   ),
   createdAt: zod.string(),
   totalXp: zod.number(),
-  completedSteps: zod.number(),
+  completedSteps: zod.number().optional(),
 });
 
 /**
@@ -796,7 +796,7 @@ export const CompleteLearningStepResponse = zod.object({
   ),
   createdAt: zod.string(),
   totalXp: zod.number(),
-  completedSteps: zod.number(),
+  completedSteps: zod.number().optional(),
 });
 
 /**
@@ -870,3 +870,446 @@ export const GetVerificationStatusResponseItem = zod.object({
 export const GetVerificationStatusResponse = zod.array(
   GetVerificationStatusResponseItem,
 );
+
+/**
+ * @summary Get skill reels feed
+ */
+export const GetReelsResponseItem = zod.object({
+  id: zod.number(),
+  userId: zod.number(),
+  skillTag: zod.string(),
+  title: zod.string(),
+  thumbnailUrl: zod.string(),
+  duration: zod.number(),
+  reelScore: zod.number(),
+  authorName: zod.string(),
+  authorAvatar: zod.string(),
+  reactionCounts: zod.object({
+    "🔥": zod.number(),
+    "🤔": zod.number(),
+    "👏": zod.number(),
+  }),
+  myReaction: zod.string().nullish(),
+  createdAt: zod.string(),
+});
+export const GetReelsResponse = zod.array(GetReelsResponseItem);
+
+/**
+ * @summary Create a new reel
+ */
+export const CreateReelBody = zod.object({
+  skillTag: zod.string(),
+  title: zod.string(),
+  duration: zod.number().optional(),
+});
+
+export const CreateReelResponse = zod.object({
+  id: zod.number(),
+  userId: zod.number(),
+  skillTag: zod.string(),
+  title: zod.string(),
+  thumbnailUrl: zod.string(),
+  duration: zod.number(),
+  reelScore: zod.number(),
+  authorName: zod.string(),
+  authorAvatar: zod.string(),
+  reactionCounts: zod.object({
+    "🔥": zod.number(),
+    "🤔": zod.number(),
+    "👏": zod.number(),
+  }),
+  myReaction: zod.string().nullish(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary React to a reel
+ */
+export const ReactToReelParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const ReactToReelBody = zod.object({
+  reaction: zod.string(),
+});
+
+export const ReactToReelResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Get active auctions
+ */
+export const GetAuctionsResponseItem = zod.object({
+  id: zod.number(),
+  sellerId: zod.number(),
+  skillTag: zod.string(),
+  title: zod.string(),
+  description: zod.string(),
+  reservePrice: zod.number(),
+  currentBid: zod.number(),
+  status: zod.string(),
+  endsAt: zod.string(),
+  sellerName: zod.string(),
+  sellerAvatar: zod.string(),
+  topBidderName: zod.string().nullish(),
+  myBid: zod.number().nullish(),
+  bidCount: zod.number(),
+});
+export const GetAuctionsResponse = zod.array(GetAuctionsResponseItem);
+
+/**
+ * @summary Create an auction
+ */
+export const CreateAuctionBody = zod.object({
+  skillTag: zod.string(),
+  title: zod.string(),
+  description: zod.string().optional(),
+  reservePrice: zod.number().optional(),
+});
+
+export const CreateAuctionResponse = zod.object({
+  id: zod.number(),
+  sellerId: zod.number(),
+  skillTag: zod.string(),
+  title: zod.string(),
+  description: zod.string(),
+  reservePrice: zod.number(),
+  currentBid: zod.number(),
+  status: zod.string(),
+  endsAt: zod.string(),
+  sellerName: zod.string(),
+  sellerAvatar: zod.string(),
+  topBidderName: zod.string().nullish(),
+  myBid: zod.number().nullish(),
+  bidCount: zod.number(),
+});
+
+/**
+ * @summary Place a bid on an auction
+ */
+export const PlaceBidParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const PlaceBidBody = zod.object({
+  amount: zod.number(),
+});
+
+export const PlaceBidResponse = zod.object({
+  success: zod.boolean(),
+  newBid: zod.number(),
+});
+
+/**
+ * @summary Get all study rooms
+ */
+export const GetStudyRoomsResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  topic: zod.string(),
+  tags: zod.array(zod.string()),
+  maxMembers: zod.number(),
+  sprintDuration: zod.number(),
+  memberCount: zod.number(),
+  presentCount: zod.number(),
+  presentMembers: zod.array(
+    zod.object({
+      id: zod.number(),
+      name: zod.string(),
+      avatar: zod.string(),
+    }),
+  ),
+  isMember: zod.boolean(),
+});
+export const GetStudyRoomsResponse = zod.array(GetStudyRoomsResponseItem);
+
+/**
+ * @summary Create a study room
+ */
+export const CreateStudyRoomBody = zod.object({
+  name: zod.string(),
+  topic: zod.string(),
+  tags: zod.array(zod.string()).optional(),
+});
+
+export const CreateStudyRoomResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  topic: zod.string(),
+  tags: zod.array(zod.string()),
+  maxMembers: zod.number(),
+  sprintDuration: zod.number(),
+  memberCount: zod.number(),
+  presentCount: zod.number(),
+  presentMembers: zod.array(
+    zod.object({
+      id: zod.number(),
+      name: zod.string(),
+      avatar: zod.string(),
+    }),
+  ),
+  isMember: zod.boolean(),
+});
+
+/**
+ * @summary Join a study room
+ */
+export const JoinStudyRoomParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const JoinStudyRoomResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Leave a study room
+ */
+export const LeaveStudyRoomParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const LeaveStudyRoomResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Get pins for a study room
+ */
+export const GetStudyRoomPinsParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const GetStudyRoomPinsResponseItem = zod.object({
+  id: zod.number(),
+  roomId: zod.number(),
+  content: zod.string(),
+  pinType: zod.string(),
+  authorName: zod.string(),
+  authorAvatar: zod.string(),
+  createdAt: zod.string(),
+});
+export const GetStudyRoomPinsResponse = zod.array(GetStudyRoomPinsResponseItem);
+
+/**
+ * @summary Add a pin to a study room
+ */
+export const AddStudyRoomPinParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const AddStudyRoomPinBody = zod.object({
+  content: zod.string(),
+  pinType: zod.string().optional(),
+});
+
+export const AddStudyRoomPinResponse = zod.object({
+  id: zod.number(),
+  roomId: zod.number(),
+  content: zod.string(),
+  pinType: zod.string(),
+  authorName: zod.string(),
+  authorAvatar: zod.string(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary Get skill DNA for current user
+ */
+export const GetSkillDnaResponse = zod.object({
+  available: zod.boolean(),
+  depth: zod.number().optional(),
+  breadth: zod.number().optional(),
+  teaching: zod.number().optional(),
+  speed: zod.number().optional(),
+  curiosity: zod.number().optional(),
+  message: zod.string().optional(),
+});
+
+/**
+ * @summary Get today's cold-start challenge
+ */
+export const GetTodayChallengeResponse = zod.object({
+  graduated: zod.boolean().optional(),
+  completedCount: zod.number(),
+  challenge: zod
+    .object({
+      id: zod.number(),
+      prompt: zod.string(),
+      skillContext: zod.string(),
+      completed: zod.boolean(),
+      creditsAwarded: zod.number(),
+    })
+    .optional(),
+});
+
+/**
+ * @summary Mark a challenge as completed
+ */
+export const CompleteChallengeParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const CompleteChallengeResponse = zod.object({
+  success: zod.boolean(),
+  creditsEarned: zod.number(),
+});
+
+/**
+ * @summary Get all skill capsules
+ */
+export const GetCapsulesResponseItem = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  description: zod.string(),
+  skillTag: zod.string(),
+  difficulty: zod.string(),
+  coverEmoji: zod.string(),
+  enrollmentCost: zod.number(),
+  totalEnrollments: zod.number(),
+  avgRating: zod.number(),
+  creatorName: zod.string(),
+  creatorAvatar: zod.string(),
+  enrolled: zod.boolean(),
+  myProgress: zod.number(),
+});
+export const GetCapsulesResponse = zod.array(GetCapsulesResponseItem);
+
+/**
+ * @summary Enroll in a skill capsule
+ */
+export const EnrollInCapsuleParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const EnrollInCapsuleResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Get lessons for a capsule
+ */
+export const GetCapsuleLessonsParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const GetCapsuleLessonsResponse = zod.object({
+  lessons: zod.array(
+    zod.object({
+      id: zod.number(),
+      capsuleId: zod.number(),
+      title: zod.string(),
+      content: zod.string(),
+      order: zod.number(),
+      durationMinutes: zod.number(),
+    }),
+  ),
+  lessonsCompleted: zod.number(),
+});
+
+/**
+ * @summary Complete a capsule lesson
+ */
+export const CompleteCapsuleLessonParams = zod.object({
+  id: zod.coerce.string(),
+  lessonId: zod.coerce.string(),
+});
+
+export const CompleteCapsuleLessonResponse = zod.object({
+  success: zod.boolean(),
+  lessonsCompleted: zod.number(),
+});
+
+/**
+ * @summary Get vouches for a user
+ */
+export const GetVouchesParams = zod.object({
+  userId: zod.coerce.string(),
+});
+
+export const GetVouchesResponseItem = zod.object({
+  id: zod.number(),
+  voucherId: zod.number(),
+  vouchedUserId: zod.number(),
+  skill: zod.string(),
+  stakeAmount: zod.number(),
+  status: zod.string(),
+  voucherName: zod.string(),
+  voucherAvatar: zod.string(),
+});
+export const GetVouchesResponse = zod.array(GetVouchesResponseItem);
+
+/**
+ * @summary Vouch for a user's skill
+ */
+export const CreateVouchBody = zod.object({
+  vouchedUserId: zod.number(),
+  skill: zod.string(),
+});
+
+export const CreateVouchResponse = zod.object({
+  success: zod.boolean(),
+  stakeAmount: zod.number(),
+});
+
+/**
+ * @summary Get active live drops
+ */
+export const GetLiveDropsResponseItem = zod.object({
+  id: zod.number(),
+  userId: zod.number(),
+  skillTag: zod.string(),
+  title: zod.string(),
+  description: zod.string(),
+  startsInMinutes: zod.number(),
+  status: zod.string(),
+  minutesLeft: zod.number(),
+  hostName: zod.string(),
+  hostAvatar: zod.string(),
+  announcedAt: zod.string(),
+  expiresAt: zod.string(),
+});
+export const GetLiveDropsResponse = zod.array(GetLiveDropsResponseItem);
+
+/**
+ * @summary Announce a live drop
+ */
+export const CreateLiveDropBody = zod.object({
+  skillTag: zod.string(),
+  title: zod.string(),
+  description: zod.string().optional(),
+  startsInMinutes: zod.number().optional(),
+});
+
+export const CreateLiveDropResponse = zod.object({
+  id: zod.number(),
+  userId: zod.number(),
+  skillTag: zod.string(),
+  title: zod.string(),
+  description: zod.string(),
+  startsInMinutes: zod.number(),
+  status: zod.string(),
+  minutesLeft: zod.number(),
+  hostName: zod.string(),
+  hostAvatar: zod.string(),
+  announcedAt: zod.string(),
+  expiresAt: zod.string(),
+});
+
+/**
+ * @summary Get monthly skill wrapped
+ */
+export const GetWrappedResponse = zod.object({
+  id: zod.number(),
+  userId: zod.number(),
+  month: zod.string(),
+  topSkillTaught: zod.string(),
+  topSkillLearned: zod.string(),
+  creditsEarned: zod.number(),
+  creditsSpent: zod.number(),
+  longestStreak: zod.number(),
+  newBadges: zod.number(),
+  totalExchanges: zod.number(),
+  aiCopy: zod.string(),
+});

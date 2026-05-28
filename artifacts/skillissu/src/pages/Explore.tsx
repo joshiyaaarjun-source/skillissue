@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence, useAnimation, PanInfo } from "framer-motion";
 import { X, Heart, Info, Star, ShieldCheck, Zap, Sparkles, Crown } from "lucide-react";
 import InstantMatchModal from "@/components/InstantMatchModal";
+import LiveDropsBanner from "@/components/LiveDropsBanner";
 import { useGetExploreUsers, getGetExploreUsersQueryKey, useRecordSwipe, useGetMe, getGetMeQueryKey, useGetSkillDemand, getGetSkillDemandQueryKey } from "@workspace/api-client-react";
 import type { SkillDemandEntry } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -268,8 +269,13 @@ export default function Explore() {
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-[#f7f3f4] overflow-hidden relative">
+      {/* Live Drops Banner */}
+      <div className="pt-14 px-0 z-10 relative">
+        <LiveDropsBanner />
+      </div>
+
       {/* Subtle header */}
-      <div className="flex items-center justify-between px-5 pt-12 pb-2 z-10 relative">
+      <div className="flex items-center justify-between px-5 pb-2 z-10 relative">
         <p className="text-xs font-semibold text-[#bd7880]/70 italic">We swiped right... on skills.</p>
         <div className="flex items-center gap-2">
           <button
