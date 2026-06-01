@@ -27,6 +27,18 @@ const DEFAULT_FLAGS = [
   { name: "reputation_staking", description: "🛡️ Peer vouches with credits at stake", enabled: true, rolloutPercent: 100 },
   { name: "live_drops", description: "🔴 Unplanned live sessions announced in real time", enabled: true, rolloutPercent: 100 },
   { name: "skill_wrapped", description: "✨ Monthly AI-narrated skill stats story", enabled: true, rolloutPercent: 100 },
+  { name: "skill_roast", description: "🔥 AI skill roast mode — opt-in brutal feedback", enabled: true, rolloutPercent: 100 },
+  { name: "mentorship_tiers", description: "🎓 Formal skill mentorship with weekly credits", enabled: true, rolloutPercent: 100 },
+  { name: "skill_forecast", description: "📈 Weekly AI skill market forecast", enabled: true, rolloutPercent: 100 },
+  { name: "anon_feedback", description: "🎭 Anonymous session feedback mode", enabled: true, rolloutPercent: 100 },
+  { name: "challenges_marketplace", description: "🏆 Post real skill challenges with credit bounties", enabled: true, rolloutPercent: 100 },
+  { name: "focus_sprints", description: "⏱️ Pomodoro-style focus sprints in sessions", enabled: true, rolloutPercent: 100 },
+  { name: "skill_twin", description: "🧬 AI-matched skill twin finder", enabled: true, rolloutPercent: 100 },
+  { name: "earn_by_reviewing", description: "💰 Earn credits by reviewing skill capsules", enabled: true, rolloutPercent: 100 },
+  { name: "skill_confessions", description: "🤫 Anonymous skill confession board", enabled: true, rolloutPercent: 100 },
+  { name: "partner_streaks", description: "❤️‍🔥 Shared session streaks with frequent partners", enabled: true, rolloutPercent: 100 },
+  { name: "skill_stories", description: "✨ 24-hour expiring skill story posts", enabled: true, rolloutPercent: 100 },
+  { name: "skill_passport", description: "🛂 Verifiable skill passport — exportable as PDF", enabled: true, rolloutPercent: 100 },
 ];
 
 async function seedFlagsIfEmpty() {

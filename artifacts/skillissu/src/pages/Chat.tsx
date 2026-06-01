@@ -61,7 +61,7 @@ export default function Chat() {
         </Avatar>
         <div className="flex-1 min-w-0">
           <h2 className="font-bold text-base truncate leading-tight">{partnerName}</h2>
-          <p className="text-xs text-muted-foreground truncate font-serif italic">We swiped right... on skills.</p>
+          <p className="text-xs text-muted-foreground truncate font-serif italic">we swiped right...on skills</p>
         </div>
       </div>
 

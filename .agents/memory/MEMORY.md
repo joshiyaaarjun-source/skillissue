@@ -1,0 +1,3 @@
+- [Seed data user IDs](seed-data-user-ids.md) — demo user is always ID 1; other users have high IDs (19+), never hardcode IDs 2-5 in seeds
+- [Zod barrel duplicate exports](zod-barrel-fix.md) — after codegen, lib/api-zod/src/index.ts must only export from "./generated/api", NOT "./generated/types" — both re-export the same names causing TS2308
+- [Routes index append pattern](routes-index-pattern.md) — never append to index.ts via bash echo — read + rewrite only; appended imports after export default break compilation silently

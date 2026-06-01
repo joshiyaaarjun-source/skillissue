@@ -25,10 +25,10 @@ export default function Login() {
         </motion.div>
         
         <h1 className="text-5xl font-extrabold tracking-tight mb-4 text-white">
-          Skillissu
+          skillissue
         </h1>
         <p className="text-xl mb-12 text-[#ffd9d9]/80 font-medium">
-          We swiped right... on skills.
+          we swiped right...on skills
         </p>
 
         <Link href="/onboarding" className="w-full block">

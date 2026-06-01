@@ -3,7 +3,7 @@ import { useParams, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Mic, MicOff, Video, VideoOff, PhoneOff, MessageSquare,
-  Clock, Star, ChevronRight, Loader2, CheckCircle2, PenLine
+  Clock, Star, ChevronRight, Loader2, CheckCircle2, PenLine, EyeOff
 } from "lucide-react";
 import SessionNotesPanel from "@/components/SessionNotesPanel";
 import { useStartSession, useEndSession, useSubmitSessionFeedback } from "@workspace/api-client-react";
@@ -50,6 +50,7 @@ function FeedbackModal({
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const submitFeedback = useSubmitSessionFeedback();
 
   const handleSubmit = () => {
@@ -105,6 +106,15 @@ function FeedbackModal({
                 value={review}
                 onChange={e => setReview(e.target.value)}
               />
+
+              <button onClick={() => setIsAnonymous(v => !v)}
+                className={`flex items-center gap-2 w-full px-4 py-2.5 rounded-xl border text-sm font-medium transition-all ${isAnonymous ? "bg-[#4d0011]/10 border-[#4d0011]/30 text-[#4d0011]" : "bg-muted border-border text-muted-foreground"}`}>
+                <EyeOff className="h-4 w-4 flex-shrink-0" />
+                <span className="flex-1 text-left">{isAnonymous ? "Posting anonymously — your name won't show" : "Post feedback anonymously"}</span>
+                <div className={`w-8 h-4 rounded-full transition-colors relative ${isAnonymous ? "bg-[#4d0011]" : "bg-muted-foreground/30"}`}>
+                  <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow transition-transform ${isAnonymous ? "translate-x-4" : "translate-x-0.5"}`} />
+                </div>
+              </button>
 
               {/* Session summary */}
               <div className="flex items-center justify-around py-3 bg-[#faf7f8] rounded-2xl">

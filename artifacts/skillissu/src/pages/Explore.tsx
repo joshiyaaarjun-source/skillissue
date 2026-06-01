@@ -276,7 +276,7 @@ export default function Explore() {
 
       {/* Subtle header */}
       <div className="flex items-center justify-between px-5 pb-2 z-10 relative">
-        <p className="text-xs font-semibold text-[#bd7880]/70 italic">We swiped right... on skills.</p>
+        <p className="text-xs font-semibold text-[#bd7880]/70 italic">we swiped right...on skills</p>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowInstantMatch(true)}
@@ -558,7 +558,7 @@ export default function Explore() {
               transition={{ delay: 0.8 }}
               className="text-[#ffd9d9]/50 text-xs font-serif italic mb-8"
             >
-              We swiped right… on skills.
+              we swiped right...on skills
             </motion.p>
 
             <motion.div

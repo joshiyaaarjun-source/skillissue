@@ -739,6 +739,220 @@ export interface SkillWrapped {
   aiCopy: string;
 }
 
+export interface SkillRoast {
+  id: number;
+  roastText: string;
+  weakestSkill: string;
+  optedIn: boolean;
+  createdAt: string;
+}
+
+export interface MentorProfile {
+  id: number;
+  name: string;
+  avatar: string;
+  skill: string;
+  avgRating: number;
+  sessionCount: number;
+  menteeCount: number;
+  bio: string;
+}
+
+export interface MentorApplicationBody {
+  skill: string;
+}
+
+export interface MentorApplicationResult {
+  success: boolean;
+  status: string;
+  message: string;
+}
+
+export interface MentorshipRecord {
+  id: number;
+  mentorId: number;
+  menteeId: number;
+  skill: string;
+  status: string;
+  weeklyCredits: number;
+  progressNotes: string;
+  mentorName: string;
+  mentorAvatar: string;
+  menteeName: string;
+  menteeAvatar: string;
+}
+
+export interface CreateMentorshipBody {
+  mentorId: number;
+  skill: string;
+}
+
+export type SkillForecastResponseForecastsItem = {
+  skill: string;
+  trend: string;
+  changePercent: number;
+  volume: number;
+};
+
+export interface SkillForecastResponse {
+  weekOf: string;
+  aiSummary: string;
+  forecasts: SkillForecastResponseForecastsItem[];
+}
+
+export interface MarketplaceChallenge {
+  id: number;
+  posterId: number;
+  title: string;
+  description: string;
+  skill: string;
+  bounty: number;
+  status: string;
+  submissionCount: number;
+  posterName: string;
+  posterAvatar: string;
+  expiresAt: string;
+  createdAt: string;
+  mySubmission?: string | null;
+}
+
+export interface CreateMarketplaceChallengeBody {
+  title: string;
+  description: string;
+  skill: string;
+  bounty: number;
+}
+
+export interface SubmitSolutionBody {
+  solution: string;
+}
+
+export interface FocusSprint {
+  id: number;
+  roomId?: number | null;
+  matchId?: number | null;
+  startedBy: number;
+  durationMinutes: number;
+  breakMinutes: number;
+  status: string;
+  accomplishment: string;
+  startedAt: string;
+  completedAt?: string | null;
+  elapsedSeconds: number;
+}
+
+export interface StartFocusSprintBody {
+  roomId?: number;
+  matchId?: number;
+  durationMinutes?: number;
+}
+
+export type SkillTwinResultTwin = {
+  id: number;
+  name: string;
+  avatar: string;
+  similarity: number;
+  sharedSkills: string[];
+  chatStarter: string;
+};
+
+export interface SkillTwinResult {
+  hasTwin: boolean;
+  twin?: SkillTwinResultTwin;
+  computedAt?: string;
+}
+
+export interface ReviewCapsuleBody {
+  review: string;
+  rating: number;
+}
+
+export interface CapsuleReviewResult {
+  success: boolean;
+  creditAwarded: number;
+  wordCount: number;
+  message: string;
+}
+
+export interface Confession {
+  id: number;
+  content: string;
+  skill: string;
+  relatableCount: number;
+  tipCount: number;
+  sameCount: number;
+  authorName: string;
+  authorInitial: string;
+  isOwn: boolean;
+  createdAt: string;
+  myReaction?: string | null;
+}
+
+export interface CreateConfessionBody {
+  content: string;
+  skill?: string;
+}
+
+export interface ConfessionReactionBody {
+  type: string;
+  tip?: string;
+}
+
+export interface PartnerStreak {
+  id: number;
+  matchId: number;
+  currentStreak: number;
+  longestStreak: number;
+  lastSessionAt?: string | null;
+  partnerName: string;
+  partnerAvatar: string;
+  skill: string;
+}
+
+export interface Story {
+  id: number;
+  userId: number;
+  content: string;
+  imageUrl: string;
+  skill: string;
+  mood: string;
+  viewCount: number;
+  expiresAt: string;
+  createdAt: string;
+  authorName: string;
+  authorAvatar: string;
+  isOwn: boolean;
+  hoursLeft: number;
+}
+
+export interface CreateStoryBody {
+  content: string;
+  skill?: string;
+  mood?: string;
+  imageUrl?: string;
+}
+
+export type SkillPassportUser = {
+  id: number;
+  name: string;
+  avatar: string;
+  bio: string;
+  level: number;
+  xp: number;
+};
+
+export interface SkillPassport {
+  user: SkillPassportUser;
+  verifiedSkills: string[];
+  topSessions: number;
+  creditsEarnedLifetime: number;
+  badgeCount: number;
+  capsulesCreated: number;
+  longestStreak: number;
+  partnerStreakCount: number;
+  totalExchanges: number;
+}
+
 export type SubmitSessionFeedback200 = {
   success: boolean;
 };
@@ -777,4 +991,37 @@ export type CompleteCapsuleLesson200 = {
 export type CreateVouch200 = {
   success: boolean;
   stakeAmount: number;
+};
+
+export type SubmitMarketplaceSolution200 = {
+  success: boolean;
+};
+
+export type PickMarketplaceWinnerBody = {
+  submissionId: number;
+};
+
+export type PickMarketplaceWinner200 = {
+  success: boolean;
+};
+
+export type GetFocusSprintsParams = {
+  roomId?: string;
+  matchId?: string;
+};
+
+export type CompleteFocusSprintBody = {
+  accomplishment: string;
+};
+
+export type CompleteFocusSprint200 = {
+  success: boolean;
+};
+
+export type ReactToConfession200 = {
+  success: boolean;
+};
+
+export type DeleteStory200 = {
+  success: boolean;
 };

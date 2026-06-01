@@ -1313,3 +1313,412 @@ export const GetWrappedResponse = zod.object({
   totalExchanges: zod.number(),
   aiCopy: zod.string(),
 });
+
+/**
+ * @summary Get or generate AI skill roast
+ */
+export const GetRoastResponse = zod.object({
+  id: zod.number(),
+  roastText: zod.string(),
+  weakestSkill: zod.string(),
+  optedIn: zod.boolean(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary Opt in to receive a roast
+ */
+export const OptInRoastResponse = zod.object({
+  id: zod.number(),
+  roastText: zod.string(),
+  weakestSkill: zod.string(),
+  optedIn: zod.boolean(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary List available mentors
+ */
+export const GetMentorsResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  avatar: zod.string(),
+  skill: zod.string(),
+  avgRating: zod.number(),
+  sessionCount: zod.number(),
+  menteeCount: zod.number(),
+  bio: zod.string(),
+});
+export const GetMentorsResponse = zod.array(GetMentorsResponseItem);
+
+/**
+ * @summary Apply to become a mentor
+ */
+export const ApplyAsMentorBody = zod.object({
+  skill: zod.string(),
+});
+
+export const ApplyAsMentorResponse = zod.object({
+  success: zod.boolean(),
+  status: zod.string(),
+  message: zod.string(),
+});
+
+/**
+ * @summary Get my active mentorships
+ */
+export const GetMyMentorshipsResponseItem = zod.object({
+  id: zod.number(),
+  mentorId: zod.number(),
+  menteeId: zod.number(),
+  skill: zod.string(),
+  status: zod.string(),
+  weeklyCredits: zod.number(),
+  progressNotes: zod.string(),
+  mentorName: zod.string(),
+  mentorAvatar: zod.string(),
+  menteeName: zod.string(),
+  menteeAvatar: zod.string(),
+});
+export const GetMyMentorshipsResponse = zod.array(GetMyMentorshipsResponseItem);
+
+/**
+ * @summary Start a mentorship
+ */
+export const CreateMentorshipBody = zod.object({
+  mentorId: zod.number(),
+  skill: zod.string(),
+});
+
+export const CreateMentorshipResponse = zod.object({
+  id: zod.number(),
+  mentorId: zod.number(),
+  menteeId: zod.number(),
+  skill: zod.string(),
+  status: zod.string(),
+  weeklyCredits: zod.number(),
+  progressNotes: zod.string(),
+  mentorName: zod.string(),
+  mentorAvatar: zod.string(),
+  menteeName: zod.string(),
+  menteeAvatar: zod.string(),
+});
+
+/**
+ * @summary Get weekly AI skill market forecast
+ */
+export const GetSkillForecastResponse = zod.object({
+  weekOf: zod.string(),
+  aiSummary: zod.string(),
+  forecasts: zod.array(
+    zod.object({
+      skill: zod.string(),
+      trend: zod.string(),
+      changePercent: zod.number(),
+      volume: zod.number(),
+    }),
+  ),
+});
+
+/**
+ * @summary List skill marketplace challenges
+ */
+export const GetMarketplaceChallengesResponseItem = zod.object({
+  id: zod.number(),
+  posterId: zod.number(),
+  title: zod.string(),
+  description: zod.string(),
+  skill: zod.string(),
+  bounty: zod.number(),
+  status: zod.string(),
+  submissionCount: zod.number(),
+  posterName: zod.string(),
+  posterAvatar: zod.string(),
+  expiresAt: zod.string(),
+  createdAt: zod.string(),
+  mySubmission: zod.string().nullish(),
+});
+export const GetMarketplaceChallengesResponse = zod.array(
+  GetMarketplaceChallengesResponseItem,
+);
+
+/**
+ * @summary Post a new skill challenge
+ */
+export const CreateMarketplaceChallengeBody = zod.object({
+  title: zod.string(),
+  description: zod.string(),
+  skill: zod.string(),
+  bounty: zod.number(),
+});
+
+export const CreateMarketplaceChallengeResponse = zod.object({
+  id: zod.number(),
+  posterId: zod.number(),
+  title: zod.string(),
+  description: zod.string(),
+  skill: zod.string(),
+  bounty: zod.number(),
+  status: zod.string(),
+  submissionCount: zod.number(),
+  posterName: zod.string(),
+  posterAvatar: zod.string(),
+  expiresAt: zod.string(),
+  createdAt: zod.string(),
+  mySubmission: zod.string().nullish(),
+});
+
+export const SubmitMarketplaceSolutionParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const SubmitMarketplaceSolutionBody = zod.object({
+  solution: zod.string(),
+});
+
+export const SubmitMarketplaceSolutionResponse = zod.object({
+  success: zod.boolean(),
+});
+
+export const PickMarketplaceWinnerParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const PickMarketplaceWinnerBody = zod.object({
+  submissionId: zod.number(),
+});
+
+export const PickMarketplaceWinnerResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Get active focus sprint
+ */
+export const GetFocusSprintsQueryParams = zod.object({
+  roomId: zod.coerce.string().optional(),
+  matchId: zod.coerce.string().optional(),
+});
+
+export const GetFocusSprintsResponse = zod.object({
+  id: zod.number(),
+  roomId: zod.number().nullish(),
+  matchId: zod.number().nullish(),
+  startedBy: zod.number(),
+  durationMinutes: zod.number(),
+  breakMinutes: zod.number(),
+  status: zod.string(),
+  accomplishment: zod.string(),
+  startedAt: zod.string(),
+  completedAt: zod.string().nullish(),
+  elapsedSeconds: zod.number(),
+});
+
+/**
+ * @summary Start a focus sprint
+ */
+export const StartFocusSprintBody = zod.object({
+  roomId: zod.number().optional(),
+  matchId: zod.number().optional(),
+  durationMinutes: zod.number().optional(),
+});
+
+export const StartFocusSprintResponse = zod.object({
+  id: zod.number(),
+  roomId: zod.number().nullish(),
+  matchId: zod.number().nullish(),
+  startedBy: zod.number(),
+  durationMinutes: zod.number(),
+  breakMinutes: zod.number(),
+  status: zod.string(),
+  accomplishment: zod.string(),
+  startedAt: zod.string(),
+  completedAt: zod.string().nullish(),
+  elapsedSeconds: zod.number(),
+});
+
+export const CompleteFocusSprintParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const CompleteFocusSprintBody = zod.object({
+  accomplishment: zod.string(),
+});
+
+export const CompleteFocusSprintResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Get my skill twin
+ */
+export const GetSkillTwinResponse = zod.object({
+  hasTwin: zod.boolean(),
+  twin: zod
+    .object({
+      id: zod.number(),
+      name: zod.string(),
+      avatar: zod.string(),
+      similarity: zod.number(),
+      sharedSkills: zod.array(zod.string()),
+      chatStarter: zod.string(),
+    })
+    .optional(),
+  computedAt: zod.string().optional(),
+});
+
+export const ReviewCapsuleParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const ReviewCapsuleBody = zod.object({
+  review: zod.string(),
+  rating: zod.number(),
+});
+
+export const ReviewCapsuleResponse = zod.object({
+  success: zod.boolean(),
+  creditAwarded: zod.number(),
+  wordCount: zod.number(),
+  message: zod.string(),
+});
+
+/**
+ * @summary Get skill confessions feed
+ */
+export const GetConfessionsResponseItem = zod.object({
+  id: zod.number(),
+  content: zod.string(),
+  skill: zod.string(),
+  relatableCount: zod.number(),
+  tipCount: zod.number(),
+  sameCount: zod.number(),
+  authorName: zod.string(),
+  authorInitial: zod.string(),
+  isOwn: zod.boolean(),
+  createdAt: zod.string(),
+  myReaction: zod.string().nullish(),
+});
+export const GetConfessionsResponse = zod.array(GetConfessionsResponseItem);
+
+export const CreateConfessionBody = zod.object({
+  content: zod.string(),
+  skill: zod.string().optional(),
+});
+
+export const CreateConfessionResponse = zod.object({
+  id: zod.number(),
+  content: zod.string(),
+  skill: zod.string(),
+  relatableCount: zod.number(),
+  tipCount: zod.number(),
+  sameCount: zod.number(),
+  authorName: zod.string(),
+  authorInitial: zod.string(),
+  isOwn: zod.boolean(),
+  createdAt: zod.string(),
+  myReaction: zod.string().nullish(),
+});
+
+export const ReactToConfessionParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const ReactToConfessionBody = zod.object({
+  type: zod.string(),
+  tip: zod.string().optional(),
+});
+
+export const ReactToConfessionResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Get my partner streaks
+ */
+export const GetPartnerStreaksResponseItem = zod.object({
+  id: zod.number(),
+  matchId: zod.number(),
+  currentStreak: zod.number(),
+  longestStreak: zod.number(),
+  lastSessionAt: zod.string().nullish(),
+  partnerName: zod.string(),
+  partnerAvatar: zod.string(),
+  skill: zod.string(),
+});
+export const GetPartnerStreaksResponse = zod.array(
+  GetPartnerStreaksResponseItem,
+);
+
+/**
+ * @summary Get active skill stories
+ */
+export const GetStoriesResponseItem = zod.object({
+  id: zod.number(),
+  userId: zod.number(),
+  content: zod.string(),
+  imageUrl: zod.string(),
+  skill: zod.string(),
+  mood: zod.string(),
+  viewCount: zod.number(),
+  expiresAt: zod.string(),
+  createdAt: zod.string(),
+  authorName: zod.string(),
+  authorAvatar: zod.string(),
+  isOwn: zod.boolean(),
+  hoursLeft: zod.number(),
+});
+export const GetStoriesResponse = zod.array(GetStoriesResponseItem);
+
+export const CreateStoryBody = zod.object({
+  content: zod.string(),
+  skill: zod.string().optional(),
+  mood: zod.string().optional(),
+  imageUrl: zod.string().optional(),
+});
+
+export const CreateStoryResponse = zod.object({
+  id: zod.number(),
+  userId: zod.number(),
+  content: zod.string(),
+  imageUrl: zod.string(),
+  skill: zod.string(),
+  mood: zod.string(),
+  viewCount: zod.number(),
+  expiresAt: zod.string(),
+  createdAt: zod.string(),
+  authorName: zod.string(),
+  authorAvatar: zod.string(),
+  isOwn: zod.boolean(),
+  hoursLeft: zod.number(),
+});
+
+export const DeleteStoryParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const DeleteStoryResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Get user skill passport data
+ */
+export const GetSkillPassportResponse = zod.object({
+  user: zod.object({
+    id: zod.number(),
+    name: zod.string(),
+    avatar: zod.string(),
+    bio: zod.string(),
+    level: zod.number(),
+    xp: zod.number(),
+  }),
+  verifiedSkills: zod.array(zod.string()),
+  topSessions: zod.number(),
+  creditsEarnedLifetime: zod.number(),
+  badgeCount: zod.number(),
+  capsulesCreated: zod.number(),
+  longestStreak: zod.number(),
+  partnerStreakCount: zod.number(),
+  totalExchanges: zod.number(),
+});

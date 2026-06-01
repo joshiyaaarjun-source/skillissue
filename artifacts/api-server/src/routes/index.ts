@@ -33,6 +33,17 @@ import capsulesRouter from "./capsules";
 import vouchesRouter from "./vouches";
 import liveDropsRouter from "./live-drops";
 import wrappedRouter from "./wrapped";
+import roastRouter from "./roast";
+import mentorshipRouter from "./mentorship";
+import forecastRouter from "./forecast";
+import marketplaceRouter from "./marketplace";
+import focusSprintsRouter from "./focus-sprints";
+import skillTwinRouter from "./skill-twin";
+import capsuleReviewsRouter from "./capsule-reviews";
+import confessionsRouter from "./confessions";
+import partnerStreaksRouter from "./partner-streaks";
+import storiesRouter from "./stories";
+import passportRouter from "./passport";
 
 const router: IRouter = Router();
 
@@ -70,5 +81,16 @@ router.use(capsulesRouter);
 router.use(vouchesRouter);
 router.use(liveDropsRouter);
 router.use(wrappedRouter);
+router.use(roastRouter);
+router.use(mentorshipRouter);
+router.use(forecastRouter);
+router.use(marketplaceRouter);
+router.use(focusSprintsRouter);
+router.use(skillTwinRouter);
+router.use(capsuleReviewsRouter);
+router.use(confessionsRouter);
+router.use(partnerStreaksRouter);
+router.use(storiesRouter);
+router.use(passportRouter);
 
 export default router;

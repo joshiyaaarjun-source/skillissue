@@ -4,6 +4,8 @@ import { Star, Flame, Zap, ArrowRight, BookOpen, User as UserIcon, Brain, Chevro
 import { useGetMe, getGetMeQueryKey, useGetNudges, getGetNudgesQueryKey, useGetExchanges, getGetExchangesQueryKey, useGetSkillCoach, getGetSkillCoachQueryKey, useGetNotifications, getGetNotificationsQueryKey } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import ColdStartWidget from "@/components/ColdStartWidget";
+import SkillTwinCard from "@/components/SkillTwinCard";
+import SkillForecastCard from "@/components/SkillForecastCard";
 import BottomNav from "@/components/BottomNav";
 import FakeNotificationBanner from "@/components/FakeNotificationBanner";
 import CreditCounter from "@/components/CreditCounter";
@@ -253,6 +255,16 @@ export default function Dashboard() {
           <ColdStartWidget />
         </motion.div>
 
+        {/* Skill Twin */}
+        <motion.div variants={itemVariants}>
+          <SkillTwinCard />
+        </motion.div>
+
+        {/* Skill Forecast */}
+        <motion.div variants={itemVariants}>
+          <SkillForecastCard />
+        </motion.div>
+
         {/* New Features Grid */}
         <motion.div variants={itemVariants}>
           <h3 className="font-bold text-sm text-muted-foreground uppercase tracking-widest mb-3 px-1">Explore More</h3>
@@ -309,6 +321,60 @@ export default function Dashboard() {
                 </div>
                 <p className="font-bold text-sm leading-none">Skill Wrapped</p>
                 <p className="text-[10px] text-white/50 leading-snug">Your month in stats</p>
+              </div>
+            </Link>
+            <Link href="/roast">
+              <div className="bg-gradient-to-br from-orange-900 to-[#4d0011] text-white rounded-2xl p-4 flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+                <div className="w-8 h-8 bg-orange-500/20 rounded-xl flex items-center justify-center">
+                  <span className="text-base">🔥</span>
+                </div>
+                <p className="font-bold text-sm leading-none">Skill Roast</p>
+                <p className="text-[10px] text-white/50 leading-snug">Get roasted by AI</p>
+              </div>
+            </Link>
+            <Link href="/mentorship">
+              <div className="bg-gradient-to-br from-[#102b1f] to-[#1a4a35] text-white rounded-2xl p-4 flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+                <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
+                  <span className="text-base">🎓</span>
+                </div>
+                <p className="font-bold text-sm leading-none">Mentorship</p>
+                <p className="text-[10px] text-white/50 leading-snug">Formal skill coaching</p>
+              </div>
+            </Link>
+            <Link href="/marketplace">
+              <div className="bg-gradient-to-br from-amber-900 to-[#4d0011] text-white rounded-2xl p-4 flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+                <div className="w-8 h-8 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                  <span className="text-base">🏆</span>
+                </div>
+                <p className="font-bold text-sm leading-none">Challenges</p>
+                <p className="text-[10px] text-white/50 leading-snug">Bounty challenges</p>
+              </div>
+            </Link>
+            <Link href="/confessions">
+              <div className="bg-gradient-to-br from-slate-800 to-[#4d0011] text-white rounded-2xl p-4 flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+                <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
+                  <span className="text-base">🤫</span>
+                </div>
+                <p className="font-bold text-sm leading-none">Confessions</p>
+                <p className="text-[10px] text-white/50 leading-snug">Anonymous board</p>
+              </div>
+            </Link>
+            <Link href="/stories">
+              <div className="bg-gradient-to-br from-[#bd7880] to-[#4d0011] text-white rounded-2xl p-4 flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+                <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
+                  <span className="text-base">✨</span>
+                </div>
+                <p className="font-bold text-sm leading-none">Stories</p>
+                <p className="text-[10px] text-white/50 leading-snug">24h skill moments</p>
+              </div>
+            </Link>
+            <Link href="/passport">
+              <div className="bg-gradient-to-br from-[#4d0011] to-slate-800 text-white rounded-2xl p-4 flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+                <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
+                  <span className="text-base">🛂</span>
+                </div>
+                <p className="font-bold text-sm leading-none">Passport</p>
+                <p className="text-[10px] text-white/50 leading-snug">Export your journey</p>
               </div>
             </Link>
           </div>

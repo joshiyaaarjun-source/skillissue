@@ -30,6 +30,13 @@ import Capsules from "@/pages/Capsules";
 import SkillWrapped from "@/pages/SkillWrapped";
 import LiveDrops from "@/pages/LiveDrops";
 import Vouches from "@/pages/Vouches";
+import SkillRoast from "@/pages/SkillRoast";
+import Mentorship from "@/pages/Mentorship";
+import SkillChallengesMarketplace from "@/pages/SkillChallengesMarketplace";
+import SkillConfessions from "@/pages/SkillConfessions";
+import SkillStories from "@/pages/SkillStories";
+import SkillPassport from "@/pages/SkillPassport";
+import PartnerStreaks from "@/pages/PartnerStreaks";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +70,13 @@ function Router() {
       <Route path="/live-drops" component={LiveDrops} />
       <Route path="/vouches/:userId" component={({ params }) => <Vouches userId={params.userId} />} />
       <Route path="/vouches" component={() => <Vouches />} />
+      <Route path="/roast" component={SkillRoast} />
+      <Route path="/mentorship" component={Mentorship} />
+      <Route path="/marketplace" component={SkillChallengesMarketplace} />
+      <Route path="/confessions" component={SkillConfessions} />
+      <Route path="/stories" component={SkillStories} />
+      <Route path="/passport" component={SkillPassport} />
+      <Route path="/partner-streaks" component={PartnerStreaks} />
       <Route component={NotFound} />
     </Switch>
   );

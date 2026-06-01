@@ -1190,6 +1190,444 @@ paths:
               schema:
                 $ref: "#/components/schemas/SkillWrapped"
 
+  /roast:
+    get:
+      operationId: getRoast
+      tags: [roast]
+      summary: Get or generate AI skill roast
+      responses:
+        "200":
+          description: Roast data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillRoast"
+  /roast/opt-in:
+    post:
+      operationId: optInRoast
+      tags: [roast]
+      summary: Opt in to receive a roast
+      responses:
+        "200":
+          description: Roast generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillRoast"
+
+  /mentors:
+    get:
+      operationId: getMentors
+      tags: [mentorship]
+      summary: List available mentors
+      responses:
+        "200":
+          description: Mentor list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MentorProfile"
+  /mentors/apply:
+    post:
+      operationId: applyAsMentor
+      tags: [mentorship]
+      summary: Apply to become a mentor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MentorApplicationBody"
+      responses:
+        "200":
+          description: Application submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MentorApplicationResult"
+  /mentorships:
+    get:
+      operationId: getMyMentorships
+      tags: [mentorship]
+      summary: Get my active mentorships
+      responses:
+        "200":
+          description: Mentorship list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MentorshipRecord"
+    post:
+      operationId: createMentorship
+      tags: [mentorship]
+      summary: Start a mentorship
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMentorshipBody"
+      responses:
+        "200":
+          description: Mentorship created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MentorshipRecord"
+
+  /forecast:
+    get:
+      operationId: getSkillForecast
+      tags: [forecast]
+      summary: Get weekly AI skill market forecast
+      responses:
+        "200":
+          description: Forecast data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillForecastResponse"
+
+  /marketplace:
+    get:
+      operationId: getMarketplaceChallenges
+      tags: [marketplace]
+      summary: List skill marketplace challenges
+      responses:
+        "200":
+          description: Challenge list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MarketplaceChallenge"
+    post:
+      operationId: createMarketplaceChallenge
+      tags: [marketplace]
+      summary: Post a new skill challenge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMarketplaceChallengeBody"
+      responses:
+        "200":
+          description: Challenge created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketplaceChallenge"
+  /marketplace/{id}/submit:
+    post:
+      operationId: submitMarketplaceSolution
+      tags: [marketplace]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitSolutionBody"
+      responses:
+        "200":
+          description: Solution submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+  /marketplace/{id}/pick-winner:
+    post:
+      operationId: pickMarketplaceWinner
+      tags: [marketplace]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                submissionId:
+                  type: number
+              required: [submissionId]
+      responses:
+        "200":
+          description: Winner picked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+
+  /focus-sprints:
+    get:
+      operationId: getFocusSprints
+      tags: [focus]
+      summary: Get active focus sprint
+      parameters:
+        - name: roomId
+          in: query
+          schema:
+            type: string
+        - name: matchId
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Sprint data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FocusSprint"
+    post:
+      operationId: startFocusSprint
+      tags: [focus]
+      summary: Start a focus sprint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartFocusSprintBody"
+      responses:
+        "200":
+          description: Sprint started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FocusSprint"
+  /focus-sprints/{id}/complete:
+    post:
+      operationId: completeFocusSprint
+      tags: [focus]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accomplishment:
+                  type: string
+              required: [accomplishment]
+      responses:
+        "200":
+          description: Sprint completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+
+  /skill-twin:
+    get:
+      operationId: getSkillTwin
+      tags: [twin]
+      summary: Get my skill twin
+      responses:
+        "200":
+          description: Skill twin data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillTwinResult"
+
+  /capsules/{id}/review:
+    post:
+      operationId: reviewCapsule
+      tags: [capsules]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewCapsuleBody"
+      responses:
+        "200":
+          description: Review submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapsuleReviewResult"
+
+  /confessions:
+    get:
+      operationId: getConfessions
+      tags: [confessions]
+      summary: Get skill confessions feed
+      responses:
+        "200":
+          description: Confession list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Confession"
+    post:
+      operationId: createConfession
+      tags: [confessions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateConfessionBody"
+      responses:
+        "200":
+          description: Confession posted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Confession"
+  /confessions/{id}/react:
+    post:
+      operationId: reactToConfession
+      tags: [confessions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfessionReactionBody"
+      responses:
+        "200":
+          description: Reaction recorded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+
+  /partner-streaks:
+    get:
+      operationId: getPartnerStreaks
+      tags: [partner]
+      summary: Get my partner streaks
+      responses:
+        "200":
+          description: Partner streaks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PartnerStreak"
+
+  /stories:
+    get:
+      operationId: getStories
+      tags: [stories]
+      summary: Get active skill stories
+      responses:
+        "200":
+          description: Stories list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Story"
+    post:
+      operationId: createStory
+      tags: [stories]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStoryBody"
+      responses:
+        "200":
+          description: Story created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Story"
+  /stories/{id}:
+    delete:
+      operationId: deleteStory
+      tags: [stories]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Story deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+
+  /passport:
+    get:
+      operationId: getSkillPassport
+      tags: [passport]
+      summary: Get user skill passport data
+      responses:
+        "200":
+          description: Passport data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillPassport"
+
+
 components:
   schemas:
     HealthStatus:
@@ -2545,3 +2983,410 @@ components:
         aiCopy:
           type: string
       required: [id, userId, month, topSkillTaught, topSkillLearned, creditsEarned, creditsSpent, longestStreak, newBadges, totalExchanges, aiCopy]
+
+    SkillRoast:
+      type: object
+      properties:
+        id:
+          type: number
+        roastText:
+          type: string
+        weakestSkill:
+          type: string
+        optedIn:
+          type: boolean
+        createdAt:
+          type: string
+      required: [id, roastText, weakestSkill, optedIn, createdAt]
+
+    MentorProfile:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        avatar:
+          type: string
+        skill:
+          type: string
+        avgRating:
+          type: number
+        sessionCount:
+          type: number
+        menteeCount:
+          type: number
+        bio:
+          type: string
+      required: [id, name, avatar, skill, avgRating, sessionCount, menteeCount, bio]
+
+    MentorApplicationBody:
+      type: object
+      properties:
+        skill:
+          type: string
+      required: [skill]
+
+    MentorApplicationResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        status:
+          type: string
+        message:
+          type: string
+      required: [success, status, message]
+
+    MentorshipRecord:
+      type: object
+      properties:
+        id:
+          type: number
+        mentorId:
+          type: number
+        menteeId:
+          type: number
+        skill:
+          type: string
+        status:
+          type: string
+        weeklyCredits:
+          type: number
+        progressNotes:
+          type: string
+        mentorName:
+          type: string
+        mentorAvatar:
+          type: string
+        menteeName:
+          type: string
+        menteeAvatar:
+          type: string
+      required: [id, mentorId, menteeId, skill, status, weeklyCredits, progressNotes, mentorName, mentorAvatar, menteeName, menteeAvatar]
+
+    CreateMentorshipBody:
+      type: object
+      properties:
+        mentorId:
+          type: number
+        skill:
+          type: string
+      required: [mentorId, skill]
+
+    SkillForecastResponse:
+      type: object
+      properties:
+        weekOf:
+          type: string
+        aiSummary:
+          type: string
+        forecasts:
+          type: array
+          items:
+            type: object
+            properties:
+              skill:
+                type: string
+              trend:
+                type: string
+              changePercent:
+                type: number
+              volume:
+                type: number
+            required: [skill, trend, changePercent, volume]
+      required: [weekOf, aiSummary, forecasts]
+
+    MarketplaceChallenge:
+      type: object
+      properties:
+        id:
+          type: number
+        posterId:
+          type: number
+        title:
+          type: string
+        description:
+          type: string
+        skill:
+          type: string
+        bounty:
+          type: number
+        status:
+          type: string
+        submissionCount:
+          type: number
+        posterName:
+          type: string
+        posterAvatar:
+          type: string
+        expiresAt:
+          type: string
+        createdAt:
+          type: string
+        mySubmission:
+          type: string
+          nullable: true
+      required: [id, posterId, title, description, skill, bounty, status, submissionCount, posterName, posterAvatar, expiresAt, createdAt]
+
+    CreateMarketplaceChallengeBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        skill:
+          type: string
+        bounty:
+          type: number
+      required: [title, description, skill, bounty]
+
+    SubmitSolutionBody:
+      type: object
+      properties:
+        solution:
+          type: string
+      required: [solution]
+
+    FocusSprint:
+      type: object
+      properties:
+        id:
+          type: number
+        roomId:
+          type: number
+          nullable: true
+        matchId:
+          type: number
+          nullable: true
+        startedBy:
+          type: number
+        durationMinutes:
+          type: number
+        breakMinutes:
+          type: number
+        status:
+          type: string
+        accomplishment:
+          type: string
+        startedAt:
+          type: string
+        completedAt:
+          type: string
+          nullable: true
+        elapsedSeconds:
+          type: number
+      required: [id, startedBy, durationMinutes, breakMinutes, status, accomplishment, startedAt, elapsedSeconds]
+
+    StartFocusSprintBody:
+      type: object
+      properties:
+        roomId:
+          type: number
+        matchId:
+          type: number
+        durationMinutes:
+          type: number
+      required: []
+
+    SkillTwinResult:
+      type: object
+      properties:
+        hasTwin:
+          type: boolean
+        twin:
+          type: object
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+            avatar:
+              type: string
+            similarity:
+              type: number
+            sharedSkills:
+              type: array
+              items:
+                type: string
+            chatStarter:
+              type: string
+          required: [id, name, avatar, similarity, sharedSkills, chatStarter]
+        computedAt:
+          type: string
+      required: [hasTwin]
+
+    ReviewCapsuleBody:
+      type: object
+      properties:
+        review:
+          type: string
+        rating:
+          type: number
+      required: [review, rating]
+
+    CapsuleReviewResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        creditAwarded:
+          type: number
+        wordCount:
+          type: number
+        message:
+          type: string
+      required: [success, creditAwarded, wordCount, message]
+
+    Confession:
+      type: object
+      properties:
+        id:
+          type: number
+        content:
+          type: string
+        skill:
+          type: string
+        relatableCount:
+          type: number
+        tipCount:
+          type: number
+        sameCount:
+          type: number
+        authorName:
+          type: string
+        authorInitial:
+          type: string
+        isOwn:
+          type: boolean
+        createdAt:
+          type: string
+        myReaction:
+          type: string
+          nullable: true
+      required: [id, content, skill, relatableCount, tipCount, sameCount, authorName, authorInitial, isOwn, createdAt]
+
+    CreateConfessionBody:
+      type: object
+      properties:
+        content:
+          type: string
+        skill:
+          type: string
+      required: [content]
+
+    ConfessionReactionBody:
+      type: object
+      properties:
+        type:
+          type: string
+        tip:
+          type: string
+      required: [type]
+
+    PartnerStreak:
+      type: object
+      properties:
+        id:
+          type: number
+        matchId:
+          type: number
+        currentStreak:
+          type: number
+        longestStreak:
+          type: number
+        lastSessionAt:
+          type: string
+          nullable: true
+        partnerName:
+          type: string
+        partnerAvatar:
+          type: string
+        skill:
+          type: string
+      required: [id, matchId, currentStreak, longestStreak, partnerName, partnerAvatar, skill]
+
+    Story:
+      type: object
+      properties:
+        id:
+          type: number
+        userId:
+          type: number
+        content:
+          type: string
+        imageUrl:
+          type: string
+        skill:
+          type: string
+        mood:
+          type: string
+        viewCount:
+          type: number
+        expiresAt:
+          type: string
+        createdAt:
+          type: string
+        authorName:
+          type: string
+        authorAvatar:
+          type: string
+        isOwn:
+          type: boolean
+        hoursLeft:
+          type: number
+      required: [id, userId, content, imageUrl, skill, mood, viewCount, expiresAt, createdAt, authorName, authorAvatar, isOwn, hoursLeft]
+
+    CreateStoryBody:
+      type: object
+      properties:
+        content:
+          type: string
+        skill:
+          type: string
+        mood:
+          type: string
+        imageUrl:
+          type: string
+      required: [content]
+
+    SkillPassport:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+            avatar:
+              type: string
+            bio:
+              type: string
+            level:
+              type: number
+            xp:
+              type: number
+          required: [id, name, avatar, bio, level, xp]
+        verifiedSkills:
+          type: array
+          items:
+            type: string
+        topSessions:
+          type: number
+        creditsEarnedLifetime:
+          type: number
+        badgeCount:
+          type: number
+        capsulesCreated:
+          type: number
+        longestStreak:
+          type: number
+        partnerStreakCount:
+          type: number
+        totalExchanges:
+          type: number
+      required: [user, verifiedSkills, topSessions, creditsEarnedLifetime, badgeCount, capsulesCreated, longestStreak, partnerStreakCount, totalExchanges]
+

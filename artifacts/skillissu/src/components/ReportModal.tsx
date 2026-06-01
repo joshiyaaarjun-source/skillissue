@@ -71,7 +71,7 @@ export default function ReportModal({ open, onClose, reportedUserId, reportedUse
               <ShieldCheck className="h-7 w-7 text-green-600" />
             </div>
             <p className="font-bold text-sm">Report Submitted</p>
-            <p className="text-xs text-muted-foreground">Our team will review it within 24 hours. Thank you for keeping Skillissu safe.</p>
+            <p className="text-xs text-muted-foreground">Our team will review it within 24 hours. Thank you for keeping skillissue safe.</p>
             <Button variant="outline" className="mt-2" onClick={onClose}>Close</Button>
           </div>
         ) : (

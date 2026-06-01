@@ -248,7 +248,7 @@ export default function Onboarding() {
           <div className="w-8 h-8 bg-[#ffd9d9] rounded-xl flex items-center justify-center shadow-lg rotate-2">
             <span className="text-[#4d0011] text-sm font-bold font-serif italic">S</span>
           </div>
-          <span className="text-[#ffd9d9]/70 text-sm font-semibold tracking-wide">Skillissu</span>
+          <span className="text-[#ffd9d9]/70 text-sm font-semibold tracking-wide">skillissue</span>
         </div>
 
         {/* Card */}

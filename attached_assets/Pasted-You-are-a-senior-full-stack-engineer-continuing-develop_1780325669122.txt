@@ -1,0 +1,190 @@
+You are a senior full-stack engineer continuing development on an existing
+production app. Your job is to make targeted changes and add new features only.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 0 — RENAME (do this first, once, before anything else)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The app was previously called "Skill Issu". It is now called "skillissue".
+New tagline: "we swiped right...on skills"
+
+Rename tasks (surgical find-and-replace only — do NOT restructure any files):
+  - Every display instance of "Skill Issu" → "skillissue"
+  - Every display instance of the old tagline → "we swiped right...on skills"
+  - Update <title> in index.html
+  - Update app name in package.json
+  - Update any logo text components
+  - Update Firebase project display name if set in config
+  - DO NOT rename any variables, functions, collection names, or file names —
+    only visible user-facing text strings
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CRITICAL — DO NOT TOUCH THESE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+All 41 features below are FULLY IMPLEMENTED AND WORKING. Do not touch them.
+
+  [ 1  ] Authentication
+  [ 2  ] Onboarding Flow
+  [ 3  ] Skill Verification (Quiz + Document)
+  [ 4  ] AI Skill Coach
+  [ 5  ] Smart Learning Paths
+  [ 6  ] Video Session System
+  [ 7  ] Session Notes + Whiteboard
+  [ 8  ] Swipe Discovery
+  [ 9  ] Skill Demand Index
+  [ 10 ] Match System
+  [ 11 ] Chat System
+  [ 12 ] Credit System
+  [ 13 ] Skill Exchange Flow
+  [ 14 ] Feedback & Ratings
+  [ 15 ] Gamification (XP, Streaks, Badges, Leaderboard)
+  [ 16 ] Skill Battles
+  [ 17 ] Referral System
+  [ 18 ] Anti-Ghosting System
+  [ 19 ] Trust & Safety
+  [ 20 ] Micro-Lessons Feed
+  [ 21 ] Analytics Dashboard
+  [ 22 ] Portfolio Mode
+  [ 23 ] Instant Match Mode
+  [ 24 ] Mood-Based Matching
+  [ 25 ] Skill Combos
+  [ 26 ] Elite Verified Badge
+  [ 27 ] Skill Timeline
+  [ 28 ] Notifications
+  [ 29 ] Dashboard
+  [ 30 ] Immutable Ledger
+  [ 31 ] Feature Flags
+  [ 32 ] Skill Reels
+  [ 33 ] Skill Auctions
+  [ 34 ] Study Rooms
+  [ 35 ] Skill DNA
+  [ 36 ] Cold-Start Challenges
+  [ 37 ] Async Voice Notes
+  [ 38 ] Skill Capsules
+  [ 39 ] Reputation Staking
+  [ 40 ] Live Skill Drops
+  [ 41 ] Skill Wrapped (Monthly)
+
+Rules:
+  - Do NOT refactor, rename, or re-implement any of the above
+  - Do NOT change existing Firestore collection names or Security Rules
+  - Do NOT change any route names or component names
+  - Do NOT change the colour palette: Rose #bd7880 / Pine #102b1f / Wine #4d0011 / Pink #ffd9d9
+  - If a new feature overlaps with an existing one, extend it — don't replace it
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NEW FEATURES (implement in order — check codebase before each one)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[ 42 ] SKILL ROAST MODE
+  - Users opt in to receive a brutally honest AI critique of their skill profile
+  - Claude reviews their ratings, feedback history, and session notes to write
+    a short, witty "roast" of their weakest skill area
+  - Delivered as a special Dashboard card with a flame icon
+  - Users can share their roast as a quote card (image export)
+  - Opt-in only — never shown unsolicited
+  - Claude prompt must be instructed to be playful, not cruel
+
+[ 43 ] MENTORSHIP TIERS
+  - Users can apply to become a "Mentor" for a specific skill
+  - Mentor requirements: 10+ sessions taught + 4.2 avg rating for that skill
+  - Mentors get a special badge and appear at the top of swipe cards for that skill
+  - Mentors can take on up to 3 "Mentees" — a formal ongoing relationship
+    tracked in Firestore with progress notes and milestone check-ins
+  - Mentees pay 3 credits/week (auto-deducted every 7 days) to their Mentor
+  - Firestore: /mentorships/{mentorshipId}
+
+[ 44 ] SKILL FORECAST
+  - A weekly AI-generated "market report" card on the Dashboard
+  - Claude analyses recent exchange data to predict which skills are trending up
+    and which are cooling off in the next 7 days
+  - Rendered as a mini chart (rising/falling arrows per skill)
+  - Personalised: highlights skills relevant to the current user's profile
+  - Refreshes every Monday at 00:00 via Cloud Function
+
+[ 45 ] ANONYMOUS FEEDBACK MODE
+  - After a session, users can leave feedback anonymously (toggle before submitting)
+  - Anonymous feedback still updates the credibility score but hides the reviewer's name
+  - Recipient sees the feedback but not who sent it
+  - A "Was this feedback helpful?" thumbs up/down below each anonymous review
+  - Admins can de-anonymise in moderation queue if a report is filed
+
+[ 46 ] SKILL CHALLENGES MARKETPLACE
+  - Any user can post a "Challenge": a real-world task they want someone to complete
+    using a specific skill (e.g. "Debug this Python script", "Review my Figma layout")
+  - Poster sets a credit bounty (5-50 credits)
+  - Other users submit their solution; poster picks the winner
+  - Winner earns the bounty; poster's credits are held in escrow during the challenge
+  - Challenges expire after 72 hours if no winner is chosen (credits refunded)
+  - Firestore: /challenges/{challengeId}, /challenges/{challengeId}/submissions
+
+[ 47 ] FOCUS SPRINTS
+  - A Pomodoro-style co-working tool accessible from any Study Room or 1-on-1 chat
+  - One user starts a sprint (25 min work / 5 min break) and others in the room join
+  - During the sprint: all chat input is disabled ("Focus mode — chat unlocks in 22 min")
+  - Sprint end triggers a check-in prompt: "What did you accomplish?"
+  - Completed sprints are logged per user and contribute to a "Deep Work" badge
+  - No new Firestore collection needed — store sprint logs in the existing session doc
+
+[ 48 ] SKILL TWIN FINDER
+  - Once a week, Claude analyses the user's full skill profile and finds their
+    "Skill Twin" — the user on the platform with the most similar teach/learn overlap
+  - Displayed as a special match card: "You and @username are 94% skill twins"
+  - Tapping it opens a pre-filled chat starter suggesting a skill swap
+  - Twins are notified simultaneously ("Someone shares your exact skill fingerprint")
+  - Computed by Cloud Function every Sunday; stored in /skillTwins/{userId}
+
+[ 49 ] EARN-BY-REVIEWING
+  - Users earn 1 credit for every peer review they write on a Skill Capsule
+    (capped at 5 credits/day to prevent farming)
+  - Reviews must be 50+ words (enforced client-side + Cloud Function validation)
+  - Short reviews are rejected with a friendly prompt to expand
+  - Credit transactions logged to immutable ledger with type: "review_reward"
+
+[ 50 ] SKILL CONFESSIONS
+  - Anonymous community feed where users post honest struggles with a skill
+  - Other users react with: Relatable / Here's a tip / Same
+  - "Here's a tip" reactions open a threaded reply (not anonymous)
+  - Top confessions of the week shown on Discover page
+  - AI moderation filters anything disrespectful before posting
+  - Firestore: /confessions/{confessionId}
+
+[ 51 ] PARTNER STREAKS
+  - When two matched users complete 3+ sessions together, they form a "Partner Streak"
+  - A shared streak counter appears on both profiles and in their chat header
+  - Missing a scheduled session breaks the streak (with a 24-hour grace period)
+  - Longest partner streak earns a "Ride or Die" badge at 30 sessions
+  - Firestore: extend existing /matches/{matchId} doc with partnerStreak fields
+
+[ 52 ] SKILL STORY MODE
+  - Users can post a "Skill Story" — a 24-hour ephemeral post (like Stories)
+  - Content: text + optional image, tagged with a skill and mood
+  - Visible to matches and followers only
+  - Stories auto-delete after 24 hours via Cloud Function TTL
+  - Viewers can reply directly to a story, which opens a chat thread
+  - Firestore: /stories/{storyId} with expiresAt timestamp
+  - New stories shown as glowing Rose-coloured rings around profile avatars
+
+[ 53 ] SKILL PASSPORT
+  - A visual, exportable "passport" document summarising a user's full journey
+  - Pages: Verified Skills, Top Sessions, Skill DNA chart, Badges earned,
+    Partner Streaks, Capsules created, total credits earned lifetime
+  - Rendered as a styled multi-page PDF (use jsPDF or html2canvas)
+  - Downloadable from Portfolio Mode
+  - Doubles as a shareable credential for job applications or LinkedIn
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+INTEGRATION RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- All UI must use ONLY: Rose #bd7880 · Pine #102b1f · Wine #4d0011 · Pink #ffd9d9
+- Every new Firestore collection needs Security Rules (append only — don't edit existing)
+- All credit transactions must be written to the existing immutable ledger
+- All Claude API calls need loading skeletons and error fallbacks
+- All new navigation entries go inside the existing nav — do not create a new nav
+- Add a feature flag for every new feature in the existing flag config
+- Every screen must work on a 390px mobile viewport
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUALITY BAR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+No placeholder UI. Every component shown must be functional.
+The user should feel they are inside a living, intelligent skill economy.
