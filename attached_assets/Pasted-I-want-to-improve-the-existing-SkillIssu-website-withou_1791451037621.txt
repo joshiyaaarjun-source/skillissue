@@ -1,0 +1,132 @@
+I want to improve the existing SkillIssu website without rebuilding or removing any of its current features.
+
+IMPORTANT: Keep the existing tech stack, database structure, authentication, navigation, and all currently working functionality intact. Make targeted improvements only.
+
+### 1. FIX EXPLORE → MATCHES LOGIC
+
+There is currently an inconsistency between the people shown in **Explore** and the people shown in **Matches**.
+
+When I am browsing people in Explore and swipe right / accept someone, that exact person should appear in my **Matches** section.
+
+The Matches page must represent my ACTUAL accepted/swiped-right people.
+
+Requirements:
+- If I swipe right / accept Person A in Explore → Person A should appear in Matches.
+- The profile shown in Matches must be the SAME user/profile I accepted.
+- Do not generate different/random users in Matches.
+- Do not show users that I never accepted.
+- Do not replace accepted users with recommended/suggested users.
+- Persist the swipe/match state in the database so it remains after refresh or logging out and back in.
+- If the current system already has a match/swap database model, reuse it rather than creating a duplicate system.
+- Make sure the Explore and Matches components use the same underlying user/match data.
+- If a mutual match is required by the existing logic, preserve that behavior, but make sure the UI clearly distinguishes between:
+  - People I accepted
+  - Mutual matches
+  - Pending/awaiting matches
+- Do not fake match data just to populate the UI.
+
+### 2. IMPROVE PROFILE PICTURES
+
+The profile pictures currently look awkward/inconsistent.
+
+Improve the profile image presentation throughout the application, especially:
+- Explore cards
+- Matches
+- Profile pages
+- Any user cards
+
+Use a clean, modern profile-picture treatment:
+- Proper circular or softly rounded profile images.
+- Consistent dimensions/aspect ratio.
+- Use `object-fit: cover` so images don't look stretched or squashed.
+- Keep the person's face centered when possible.
+- Avoid awkward cropping.
+- Add a clean fallback avatar when no profile picture exists.
+- Make the image size responsive for desktop and mobile.
+- Do not distort low-resolution images.
+- Keep the overall appearance professional and similar to modern social/matching platforms.
+
+The profile photo should feel like an actual person's profile rather than a random image placed inside a card.
+
+### 3. IMPROVE THE LOGIN PAGE
+
+The current login page feels too plain.
+
+Redesign ONLY the visual presentation of the login/authentication page while keeping the existing authentication functionality exactly the same.
+
+Make it feel like a polished modern SkillIssu product.
+
+Design direction:
+- Keep SkillIssu's existing brand identity.
+- Clean modern layout.
+- Better typography hierarchy.
+- Strong but subtle visual identity.
+- Attractive background treatment instead of a completely empty/plain page.
+- Use the SkillIssu logo/branding prominently but tastefully.
+- Add a short, compelling tagline explaining the concept of SkillIssu.
+- Make the login/signup card feel polished with proper spacing, rounded corners, subtle shadows/borders, and good visual hierarchy.
+- Improve input fields, buttons, focus states, hover states, and error states.
+- Make the primary CTA visually obvious.
+- Make the page look good on both desktop and mobile.
+- Avoid excessive gradients, excessive animations, or anything that makes it look like a generic AI-generated SaaS landing page.
+- Keep it youthful and social because SkillIssu is about people exchanging skills.
+- The page should feel trustworthy and production-ready.
+
+Possible tagline direction:
+"Learn a skill. Share a skill. Grow together."
+
+Do not force this exact tagline if another existing SkillIssu tagline fits the current branding better.
+
+### 4. CONSISTENCY ACROSS THE APP
+
+While making these changes, make sure the visual language is consistent between:
+- Explore
+- Matches
+- Profile
+- Login
+- Navigation
+
+Use consistent:
+- Border radius
+- Typography
+- Spacing
+- Button styles
+- Profile image styling
+- Colors
+- Card design
+
+### 5. VERY IMPORTANT — DON'T BREAK EXISTING FEATURES
+
+Before modifying anything, inspect the existing codebase and understand how:
+- Users are stored
+- Explore users are fetched
+- Swipe/accept actions are handled
+- Matches are stored
+- Matches are fetched
+- Profile images are stored/displayed
+- Authentication works
+
+Then make the smallest necessary changes.
+
+DO NOT:
+- Remove existing features.
+- Replace the existing database with mock data.
+- Hardcode users.
+- Create fake matches.
+- Break authentication.
+- Replace working APIs unnecessarily.
+- Remove existing navigation.
+- Rebuild the entire application from scratch.
+
+After implementing, test the complete flow:
+
+SIGN UP / LOGIN
+→ EXPLORE
+→ VIEW USER
+→ SWIPE RIGHT / ACCEPT
+→ MATCHES
+→ VERIFY THE EXACT SAME USER APPEARS
+
+Also verify that refreshing the page does not lose the match.
+
+The final result should feel like the SAME SkillIssu application, just significantly more polished, consistent, and functional.
