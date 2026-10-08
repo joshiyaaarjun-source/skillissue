@@ -43,8 +43,9 @@ export default function Matches() {
 
   const isLoading = matchesLoading || exchangesLoading;
 
-  const activeMatches = matches?.filter(m => m.status !== "completed") ?? [];
-  const pastMatches = matches?.filter(m => m.status === "completed") ?? [];
+  const activeMatches = matches?.filter(m => m.isMutual && m.status !== "completed") ?? [];
+  const awaitingMatches = matches?.filter(m => !m.isMutual && m.status === "pending") ?? [];
+  const pastMatches = matches?.filter(m => m.isMutual && m.status === "completed") ?? [];
 
   const getActiveExchange = (matchId: string) =>
     exchanges?.find(e => e.matchId === matchId && e.status === "active");
@@ -71,7 +72,7 @@ export default function Matches() {
           <h1 className="text-3xl font-extrabold text-[#4d0011]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
             Matches
           </h1>
-          <p className="text-muted-foreground text-sm mt-1 italic">People ready to swap skills with you.</p>
+          <p className="text-muted-foreground text-sm mt-1 italic">Your accepted requests, mutual matches, and completed exchanges.</p>
         </div>
 
         {/* Summary metrics */}
@@ -79,7 +80,7 @@ export default function Matches() {
           <StatCard
             icon={Users}
             value={matches?.length ?? 0}
-            label="Total Matches"
+            label="Accepted people"
             color="bg-[#ffd9d9] text-[#4d0011]"
           />
           <StatCard
@@ -96,23 +97,24 @@ export default function Matches() {
           />
         </div>
 
-        {/* Active Matches */}
+        {/* Mutual Matches */}
         <section>
           <div className="flex items-center gap-2 mb-3">
             <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-            <h2 className="text-sm font-bold text-[#4d0011] uppercase tracking-wide">Active · {activeMatches.length}</h2>
+            <h2 className="text-sm font-bold text-[#4d0011] uppercase tracking-wide">Mutual matches · {activeMatches.length}</h2>
           </div>
 
           {activeMatches.length === 0 ? (
             <div className="bg-white rounded-2xl border border-dashed border-[#bd7880]/30 p-8 text-center">
               <MessageCircle className="h-8 w-8 text-[#bd7880]/40 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">No active matches yet.</p>
-              <p className="text-xs text-muted-foreground/70 mt-1">Keep swiping on the Explore page.</p>
+              <p className="text-sm text-muted-foreground">No mutual matches yet.</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">When you both accept, you can plan an exchange here.</p>
             </div>
           ) : (
             <div className="space-y-3">
               {activeMatches.map(match => {
                 const activeExchange = getActiveExchange(match.id);
+                const hasMatchRecord = /^\d+$/.test(match.id);
                 return (
                   <motion.div
                     key={match.id}
@@ -131,7 +133,7 @@ export default function Matches() {
                           <Avatar className="h-14 w-14 border-2 border-[#ffd9d9]">
                             <AvatarImage src={match.matchedUser.avatar} />
                             <AvatarFallback className="bg-[#bd7880] text-white font-bold text-lg">
-                              {match.matchedUser.name[0]}
+                              {match.matchedUser.name.split(/\s+/).map(part => part[0]).slice(0, 2).join("").toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           {match.matchedUser.verificationStatus === "fully_verified" && (
@@ -188,31 +190,39 @@ export default function Matches() {
 
                       {/* Action buttons */}
                       <div className="space-y-2">
-                        <Button
-                          size="sm"
-                          className="w-full bg-[#102b1f] hover:bg-[#102b1f]/85 text-white font-bold rounded-xl h-9 gap-2"
-                          onClick={() => navigate(`/session/${match.id}`)}
-                        >
-                          <Video size={14} /> Start Session
-                        </Button>
-                        <div className="grid grid-cols-2 gap-2">
-                          <Link href={`/chat/${match.id}`} className="block">
+                        {hasMatchRecord ? (
+                          <>
                             <Button
-                              variant="outline"
                               size="sm"
-                              className="w-full border-[#bd7880]/40 text-[#4d0011] hover:bg-[#ffd9d9]/40 font-bold rounded-xl h-9"
+                              className="w-full bg-[#102b1f] hover:bg-[#102b1f]/85 text-white font-bold rounded-xl h-9 gap-2"
+                              onClick={() => navigate(`/session/${match.id}`)}
                             >
-                              <MessageCircle size={14} className="mr-1.5" /> Message
+                              <Video size={14} /> Start Session
                             </Button>
-                          </Link>
-                          <Button
-                            size="sm"
-                            className="w-full bg-[#4d0011] text-white hover:bg-[#4d0011]/85 font-bold rounded-xl h-9"
-                            onClick={() => { setSelectedPartner(match.matchedUser); setSelectedMatchId(match.id); }}
-                          >
-                            <Handshake size={14} className="mr-1.5" /> Propose
-                          </Button>
-                        </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <Link href={`/chat/${match.id}`} className="block">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="w-full border-[#bd7880]/40 text-[#4d0011] hover:bg-[#ffd9d9]/40 font-bold rounded-xl h-9"
+                                >
+                                  <MessageCircle size={14} className="mr-1.5" /> Message
+                                </Button>
+                              </Link>
+                              <Button
+                                size="sm"
+                                className="w-full bg-[#4d0011] text-white hover:bg-[#4d0011]/85 font-bold rounded-xl h-9"
+                                onClick={() => { setSelectedPartner(match.matchedUser); setSelectedMatchId(match.id); }}
+                              >
+                                <Handshake size={14} className="mr-1.5" /> Propose
+                              </Button>
+                            </div>
+                          </>
+                        ) : (
+                          <p role="status" className="rounded-xl bg-[#f8efed] px-3 py-2 text-xs leading-5 text-[#704951]">
+                            You both accepted. Session and messaging actions will appear when the match is ready.
+                          </p>
+                        )}
                         <button
                           onClick={() => setReportTarget({ id: parseInt(match.matchedUser.id), name: match.matchedUser.name })}
                           className="mt-2 flex items-center gap-1 text-[10px] text-muted-foreground/50 hover:text-destructive transition-colors"
@@ -228,6 +238,50 @@ export default function Matches() {
             </div>
           )}
         </section>
+
+        {awaitingMatches.length > 0 && (
+          <section>
+            <div className="mb-3 flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-amber-500" />
+              <h2 className="text-sm font-bold uppercase tracking-wide text-[#684a32]">Awaiting their yes · {awaitingMatches.length}</h2>
+            </div>
+            <div className="space-y-3">
+              {awaitingMatches.map(match => (
+                <motion.article
+                  key={match.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="overflow-hidden rounded-2xl border border-[#e8d4b8] bg-[#fffaf1] shadow-sm"
+                >
+                  <div className="flex items-center gap-3 p-4">
+                    <Avatar className="h-14 w-14 shrink-0 border-2 border-[#edd6ad]">
+                      <AvatarImage src={match.matchedUser.avatar} alt={`${match.matchedUser.name} profile`} />
+                      <AvatarFallback className="bg-[#e8d6bb] text-lg font-bold text-[#684a32]">
+                        {match.matchedUser.name.split(/\s+/).map(part => part[0]).slice(0, 2).join("").toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h3 className="font-bold text-[#4d2c25]">{match.matchedUser.name}</h3>
+                        <span className="rounded-full border border-[#e3c89e] bg-[#f6e8cb] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#785a32]">You said yes</span>
+                      </div>
+                      <p className="mt-1 text-xs leading-5 text-[#846f5d]">
+                        Your skill request is saved. You can start an exchange once they accept too.
+                      </p>
+                      {match.overlappingSkills.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {match.overlappingSkills.slice(0, 3).map(skill => (
+                            <span key={skill} className="rounded-full border border-[#e8d9c6] bg-white/70 px-2.5 py-1 text-[10px] font-semibold text-[#765a48]">{skill}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Past Matches */}
         {pastMatches.length > 0 && (
@@ -245,7 +299,7 @@ export default function Matches() {
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={match.matchedUser.avatar} />
                         <AvatarFallback className="bg-muted text-muted-foreground font-bold">
-                          {match.matchedUser.name[0]}
+                           {match.matchedUser.name.split(/\s+/).map(part => part[0]).slice(0, 2).join("").toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">

@@ -3,7 +3,7 @@ import { motion, AnimatePresence, useAnimation, PanInfo } from "framer-motion";
 import { X, Heart, Info, Star, ShieldCheck, Zap, Sparkles, Crown } from "lucide-react";
 import InstantMatchModal from "@/components/InstantMatchModal";
 import LiveDropsBanner from "@/components/LiveDropsBanner";
-import { useGetExploreUsers, getGetExploreUsersQueryKey, useRecordSwipe, useGetMe, getGetMeQueryKey, useGetSkillDemand, getGetSkillDemandQueryKey } from "@workspace/api-client-react";
+import { useGetExploreUsers, getGetExploreUsersQueryKey, useRecordSwipe, useGetMe, getGetMeQueryKey, useGetSkillDemand, getGetSkillDemandQueryKey, getGetMatchesQueryKey } from "@workspace/api-client-react";
 import type { SkillDemandEntry } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import BottomNav from "@/components/BottomNav";
@@ -12,13 +12,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import type { ExploreUser } from "@workspace/api-client-react";
 import confetti from "canvas-confetti";
+import { useLocation } from "wouter";
 
-function getDemandInfo(skill: string, demand: SkillDemandEntry[]): { emoji: string; label: string } | null {
+function getDemandInfo(skill: string, demand: SkillDemandEntry[]): { label: string } | null {
   const entry = demand.find(d => d.skill.toLowerCase() === skill.toLowerCase());
   if (!entry) return null;
-  if (entry.level === "high") return { emoji: "🔥", label: "High" };
-  if (entry.level === "rising") return { emoji: "📈", label: "Rising" };
-  return { emoji: "🧊", label: "Low" };
+  if (entry.level === "high") return { label: "High demand" };
+  if (entry.level === "rising") return { label: "Rising" };
+  return { label: "Low demand" };
 }
 
 function SkillPill({ label, variant, demand }: {
@@ -33,7 +34,7 @@ function SkillPill({ label, variant, demand }: {
         ? "bg-[#bd7880] text-white"
         : "border border-[#ffd9d9]/60 text-[#ffd9d9] bg-transparent"
     }`}>
-      {info && <span className="text-[10px] leading-none" title={`${info.label} demand`}>{info.emoji}</span>}
+      {info && <span className="text-[9px] font-bold uppercase tracking-wide opacity-80" title={info.label}>{info.label}</span>}
       {label}
     </span>
   );
@@ -71,7 +72,7 @@ function ProfilePreviewSheet({
         <div className="absolute inset-0 bg-gradient-to-b from-[#4d0011]/80 to-[#0e0a0c]" />
         <Avatar className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 h-28 w-28 border-4 border-[#bd7880] shadow-2xl">
           <AvatarImage src={user.avatar} />
-          <AvatarFallback className="text-3xl font-bold bg-[#4d0011] text-[#ffd9d9]">{user.name[0]}</AvatarFallback>
+          <AvatarFallback className="text-3xl font-bold bg-[#4d0011] text-[#ffd9d9]">{user.name.split(/\s+/).map(part => part[0]).slice(0, 2).join("").toUpperCase()}</AvatarFallback>
         </Avatar>
         <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-white">
           <X size={16} />
@@ -148,7 +149,8 @@ function ProfilePreviewSheet({
 }
 
 export default function Explore() {
-  const { data: users, isLoading } = useGetExploreUsers({ query: { queryKey: getGetExploreUsersQueryKey() } });
+  const [, navigate] = useLocation();
+  const { data: users, isLoading, isError: usersError, refetch: refetchUsers } = useGetExploreUsers({ query: { queryKey: getGetExploreUsersQueryKey() } });
   const { data: me } = useGetMe({ query: { queryKey: getGetMeQueryKey() } });
   const { data: demandData } = useGetSkillDemand({ query: { queryKey: getGetSkillDemandQueryKey() } });
   const recordSwipe = useRecordSwipe();
@@ -156,18 +158,22 @@ export default function Explore() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMatchOverlay, setShowMatchOverlay] = useState(false);
   const [matchedUser, setMatchedUser] = useState<ExploreUser | null>(null);
+  const [matchedId, setMatchedId] = useState<string | null>(null);
   const [previewUser, setPreviewUser] = useState<ExploreUser | null>(null);
   const [swipeHint, setSwipeHint] = useState<"left" | "right" | null>(null);
   const [showInstantMatch, setShowInstantMatch] = useState(false);
   const [mood, setMood] = useState<string | null>(null);
   const [combosOnly, setCombosOnly] = useState(false);
+  const [swipeError, setSwipeError] = useState<string | null>(null);
+  const [failedDirection, setFailedDirection] = useState<"left" | "right">("right");
+  const [swiping, setSwiping] = useState(false);
   const controls = useAnimation();
 
   const MOODS = [
-    { id: "relaxed", label: "🧘 Relaxed", tags: ["yoga", "meditation", "cooking", "gardening", "music", "art", "writing"] },
-    { id: "focused", label: "🎯 Focused", tags: ["coding", "design", "math", "science", "programming", "data"] },
-    { id: "creative", label: "🎨 Creative", tags: ["art", "design", "writing", "photography", "music", "film", "drawing"] },
-    { id: "fast", label: "⚡ Fast", tags: ["coding", "engineering", "tech", "react", "python", "javascript", "sql"] },
+    { id: "relaxed", label: "Relaxed", tags: ["yoga", "meditation", "cooking", "gardening", "music", "art", "writing"] },
+    { id: "focused", label: "Focused", tags: ["coding", "design", "math", "science", "programming", "data"] },
+    { id: "creative", label: "Creative", tags: ["art", "design", "writing", "photography", "music", "film", "drawing"] },
+    { id: "fast", label: "Fast-paced", tags: ["coding", "engineering", "tech", "react", "python", "javascript", "sql"] },
   ];
 
   const displayUsers = useMemo(() => {
@@ -197,38 +203,47 @@ export default function Explore() {
   }, [users, mood, combosOnly, me?.skillsWanted]);
 
   const handleSwipe = async (direction: "left" | "right") => {
-    if (!displayUsers.length) return;
+    if (!displayUsers.length || swiping) return;
     const currentUser = displayUsers[currentIndex];
+    if (!currentUser) return;
+    setSwipeError(null);
+    setFailedDirection(direction);
+    setSwiping(true);
+    try {
+      const result = await recordSwipe.mutateAsync({ data: { targetUserId: currentUser.id, direction } });
+      const removeSwipedUser = () => {
+        queryClient.setQueryData<ExploreUser[]>(
+          getGetExploreUsersQueryKey(),
+          cachedUsers => cachedUsers?.filter(user => user.id !== currentUser.id)
+        );
+        void queryClient.invalidateQueries({ queryKey: getGetExploreUsersQueryKey() });
+      };
 
-    await controls.start({
-      x: direction === "right" ? 520 : -520,
-      opacity: 0,
-      rotate: direction === "right" ? 18 : -18,
-      transition: { duration: 0.28, ease: "easeIn" },
-    });
-
-    recordSwipe.mutate({ data: { targetUserId: currentUser.id, direction } }, {
-      onSuccess: (result) => {
-        if (result.matched) {
-          setMatchedUser(currentUser);
-          setShowMatchOverlay(true);
-          confetti({ particleCount: 180, spread: 110, origin: { y: 0.55 }, colors: ["#bd7880", "#ffd9d9", "#f5c842", "#4d0011"] });
-          setTimeout(() => {
-            setShowMatchOverlay(false);
-            setCurrentIndex(p => p + 1);
-            controls.set({ x: 0, opacity: 1, rotate: 0 });
-            queryClient.invalidateQueries({ queryKey: ["/api/matches"] });
-          }, 3200);
-        } else {
-          setCurrentIndex(p => p + 1);
-          controls.set({ x: 0, opacity: 1, rotate: 0 });
-        }
-      },
-      onError: () => {
-        setCurrentIndex(p => p + 1);
+      if (direction === "right") {
+        void queryClient.invalidateQueries({ queryKey: getGetMatchesQueryKey() });
+      }
+      if (result.matched && direction === "right") {
+        removeSwipedUser();
+        setMatchedUser(currentUser);
+        setMatchedId(result.matchId ?? null);
+        setShowMatchOverlay(true);
+        confetti({ particleCount: 120, spread: 90, origin: { y: 0.55 }, colors: ["#bd7880", "#ffd9d9", "#f5c842", "#4d0011"] });
+      } else {
+        await controls.start({
+          x: direction === "right" ? 520 : -520,
+          opacity: 0,
+          rotate: direction === "right" ? 18 : -18,
+          transition: { duration: 0.28, ease: "easeIn" },
+        });
+        removeSwipedUser();
         controls.set({ x: 0, opacity: 1, rotate: 0 });
-      },
-    });
+      }
+    } catch {
+      controls.set({ x: 0, opacity: 1, rotate: 0 });
+      setSwipeError("That didn’t save. Your profile is still here—try again when you’re ready.");
+    } finally {
+      setSwiping(false);
+    }
   };
 
   const handleDragEnd = (_: any, info: PanInfo) => {
@@ -248,6 +263,17 @@ export default function Explore() {
     return (
       <div className="min-h-[100dvh] flex flex-col items-center justify-center p-4 bg-background">
         <Skeleton className="h-[68vh] w-full max-w-sm rounded-3xl" />
+        <BottomNav />
+      </div>
+    );
+  }
+
+  if (usersError) {
+    return (
+      <div className="min-h-[100dvh] flex flex-col items-center justify-center p-6 bg-background pb-24 text-center">
+        <h2 className="text-xl font-bold mb-2">We couldn’t load Explore</h2>
+        <p className="text-muted-foreground text-sm mb-5">Your peer list is having a moment. Try again.</p>
+        <Button onClick={() => refetchUsers()} className="bg-[#4d0011] text-white">Retry</Button>
         <BottomNav />
       </div>
     );
@@ -281,6 +307,7 @@ export default function Explore() {
           <button
             onClick={() => setShowInstantMatch(true)}
             className="flex items-center gap-1 text-xs font-bold bg-yellow-400 text-[#4d0011] px-2.5 py-1 rounded-full shadow-sm hover:bg-yellow-300 transition-colors"
+            disabled={swiping}
           >
             <Zap className="h-3 w-3 fill-current" />
             Match Now
@@ -312,11 +339,17 @@ export default function Explore() {
               : "bg-white/70 text-[#102b1f] border-[#102b1f]/30"
           }`}
         >
-          🔗 Combos
+          Skill combos
         </button>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 pb-32 relative">
+        {swipeError && (
+          <div role="alert" className="absolute top-0 z-30 flex w-[calc(100%-2rem)] max-w-[360px] items-center justify-between gap-3 rounded-2xl border border-[#d7a49e] bg-[#fff8f4] px-4 py-3 text-left shadow-lg">
+            <p className="text-xs font-medium leading-5 text-[#6d3440]">{swipeError}</p>
+            <button onClick={() => handleSwipe(failedDirection)} disabled={swiping} className="shrink-0 rounded-xl bg-[#741f37] px-3 py-2 text-xs font-bold text-white disabled:opacity-50">Retry</button>
+          </div>
+        )}
         {/* Next card (peeking) */}
         {nextUser && (
           <div className="absolute w-[calc(100%-3rem)] max-w-[360px] h-[66vh] max-h-[580px] rounded-3xl bg-white shadow-sm scale-[0.94] -translate-y-3 z-0 overflow-hidden pointer-events-none opacity-60">
@@ -366,7 +399,7 @@ export default function Explore() {
             <Avatar className="w-full h-full rounded-none">
               <AvatarImage src={currentUser.avatar} className="w-full h-full object-cover rounded-none" />
               <AvatarFallback className="w-full h-full rounded-none bg-gradient-to-br from-[#4d0011] to-[#bd7880] text-6xl font-bold text-white flex items-center justify-center">
-                {currentUser.name[0]}
+                {currentUser.name.split(/\s+/).map(part => part[0]).slice(0, 2).join("").toUpperCase()}
               </AvatarFallback>
             </Avatar>
             {/* Dark gradient fade */}
@@ -386,15 +419,15 @@ export default function Explore() {
               {demandData && currentUser.skillsOffered.some(s =>
                 demandData.find(d => d.skill.toLowerCase() === s.toLowerCase())?.level === "high"
               ) && (
-                <ContextBadge label="🔥 High Demand" color="bg-[#4d0011]/90 text-[#ffd9d9]" />
+                <ContextBadge label="High demand" color="bg-[#4d0011]/90 text-[#ffd9d9]" />
               )}
               {currentUser.credibilityScore >= 4.5 && currentUser.exchangeCount >= 5 && (
-                <ContextBadge label="👑 Elite" color="bg-yellow-400/90 text-[#4d0011]" />
+                <ContextBadge label="Elite" color="bg-yellow-400/90 text-[#4d0011]" />
               )}
               {me && (() => {
                 const myWanted = (me.skillsWanted ?? []).map(s => s.toLowerCase());
                 const comboCount = currentUser.skillsOffered.filter(s => myWanted.includes(s.toLowerCase())).length;
-                return comboCount >= 2 ? <ContextBadge label={`🔗 ${comboCount} Skills Match`} color="bg-[#102b1f]/90 text-[#ffd9d9]" /> : null;
+                 return comboCount >= 2 ? <ContextBadge label={`${comboCount} skill matches`} color="bg-[#102b1f]/90 text-[#ffd9d9]" /> : null;
               })()}
             </div>
 
@@ -452,6 +485,7 @@ export default function Explore() {
           <motion.button
             whileTap={{ scale: 0.88 }}
             onClick={() => handleSwipe("left")}
+            disabled={swiping}
             className="h-14 w-14 rounded-full border-2 border-red-300/60 bg-white text-red-400 flex items-center justify-center shadow-lg hover:border-red-400 hover:bg-red-50 transition-colors"
           >
             <X size={22} />
@@ -461,6 +495,7 @@ export default function Explore() {
           <motion.button
             whileTap={{ scale: 0.88 }}
             onClick={() => setPreviewUser(currentUser)}
+            disabled={swiping}
             className="h-11 w-11 rounded-full border-2 border-[#bd7880]/40 bg-white text-[#bd7880] flex items-center justify-center shadow-md hover:border-[#bd7880] hover:bg-[#ffd9d9]/20 transition-colors"
           >
             <Info size={18} />
@@ -470,6 +505,7 @@ export default function Explore() {
           <motion.button
             whileTap={{ scale: 0.88 }}
             onClick={() => handleSwipe("right")}
+            disabled={swiping}
             className="h-14 w-14 rounded-full border-2 border-[#bd7880] bg-[#bd7880] text-white flex items-center justify-center shadow-lg hover:bg-[#bd7880]/90 transition-colors"
           >
             <Heart size={22} className="fill-current" />
@@ -541,14 +577,14 @@ export default function Explore() {
             >
               <Avatar className="h-24 w-24 border-4 border-[#bd7880] shadow-2xl">
                 <AvatarImage src={me?.avatar} />
-                <AvatarFallback className="text-3xl font-bold bg-[#4d0011] text-[#ffd9d9]">{me?.name?.[0] ?? "A"}</AvatarFallback>
+                <AvatarFallback className="text-3xl font-bold bg-[#4d0011] text-[#ffd9d9]">{me?.name?.split(/\s+/).map(part => part[0]).slice(0, 2).join("").toUpperCase() ?? "A"}</AvatarFallback>
               </Avatar>
               <div className="flex flex-col items-center gap-1">
                 <Heart size={22} className="text-[#bd7880] fill-current" />
               </div>
               <Avatar className="h-24 w-24 border-4 border-[#bd7880] shadow-2xl">
                 <AvatarImage src={matchedUser.avatar} />
-                <AvatarFallback className="text-3xl font-bold bg-[#4d0011] text-[#ffd9d9]">{matchedUser.name[0]}</AvatarFallback>
+                <AvatarFallback className="text-3xl font-bold bg-[#4d0011] text-[#ffd9d9]">{matchedUser.name.split(/\s+/).map(part => part[0]).slice(0, 2).join("").toUpperCase()}</AvatarFallback>
               </Avatar>
             </motion.div>
 
@@ -567,12 +603,16 @@ export default function Explore() {
               transition={{ delay: 1.0 }}
               className="flex flex-col gap-3 w-full max-w-xs"
             >
-              <Button className="w-full h-12 bg-[#bd7880] hover:bg-[#bd7880]/90 text-white font-bold rounded-2xl text-base shadow-lg">
+              <Button
+                onClick={() => matchedId && navigate(`/session/${matchedId}`)}
+                disabled={!matchedId}
+                className="w-full h-12 rounded-2xl bg-[#bd7880] text-base font-bold text-white shadow-lg hover:bg-[#bd7880]/90 disabled:opacity-50"
+              >
                 Start Session
               </Button>
               <Button
                 variant="ghost"
-                onClick={() => { setShowMatchOverlay(false); setCurrentIndex(p => p + 1); controls.set({ x: 0, opacity: 1, rotate: 0 }); }}
+                onClick={() => { setShowMatchOverlay(false); controls.set({ x: 0, opacity: 1, rotate: 0 }); }}
                 className="w-full h-12 text-[#ffd9d9]/60 hover:text-[#ffd9d9] font-semibold rounded-2xl"
               >
                 Keep Swiping

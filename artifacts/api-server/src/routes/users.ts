@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, usersTable, monthlyGoalsTable, skillProgressTable } from "@workspace/db";
+import { db, usersTable, monthlyGoalsTable, skillProgressTable, swipesTable } from "@workspace/db";
 import { eq, ne } from "drizzle-orm";
 import { GetUserParams, GetMeResponse, GetUserResponse, GetExploreUsersResponse } from "@workspace/api-zod";
 
@@ -57,9 +57,15 @@ router.get("/users/explore", async (req, res): Promise<void> => {
 
   const mySkillsOffered = currentUser.skillsOffered;
   const mySkillsWanted = currentUser.skillsWanted;
-  const others = await db.select().from(usersTable).where(ne(usersTable.id, DEMO_USER_ID));
+  const [others, priorSwipes] = await Promise.all([
+    db.select().from(usersTable).where(ne(usersTable.id, DEMO_USER_ID)),
+    db.select({ targetId: swipesTable.targetId })
+      .from(swipesTable)
+      .where(eq(swipesTable.swiperId, DEMO_USER_ID)),
+  ]);
+  const swipedUserIds = new Set(priorSwipes.map(swipe => swipe.targetId));
 
-  const exploreUsers = others.map(u => {
+  const exploreUsers = others.filter(u => !swipedUserIds.has(u.id)).map(u => {
     const overlapping = [
       ...mySkillsWanted.filter(s => u.skillsOffered.includes(s)),
       ...mySkillsOffered.filter(s => u.skillsWanted.includes(s)),

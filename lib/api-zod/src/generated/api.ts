@@ -209,6 +209,7 @@ export const GetMatchesResponseItem = zod.object({
   createdAt: zod.string(),
   overlappingSkills: zod.array(zod.string()),
   status: zod.enum(["pending", "active", "completed"]),
+  isMutual: zod.boolean(),
 });
 export const GetMatchesResponse = zod.array(GetMatchesResponseItem);
 

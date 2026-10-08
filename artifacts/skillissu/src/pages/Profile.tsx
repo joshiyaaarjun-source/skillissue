@@ -86,7 +86,7 @@ export default function Profile() {
           <Avatar className="h-24 w-24 border-4 border-white/20 shadow-lg mb-4">
             <AvatarImage src={me.avatar} />
             <AvatarFallback className="bg-[#bd7880] text-white font-bold text-3xl">
-              {me.name.charAt(0)}
+              {me.name.split(/\s+/).map(part => part[0]).slice(0, 2).join("").toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div className="flex items-center gap-2 mb-2">
@@ -328,7 +328,7 @@ export default function Profile() {
                       <div className="flex items-center gap-2 mb-1">
                         <Avatar className="h-6 w-6">
                           <AvatarImage src={exchange.partnerAvatar} />
-                          <AvatarFallback className="text-[9px]">{exchange.partnerName[0]}</AvatarFallback>
+                          <AvatarFallback className="text-[9px] font-semibold">{exchange.partnerName.split(/\s+/).map(part => part[0]).slice(0, 2).join("").toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <span className="text-sm font-bold">{exchange.partnerName}</span>
                         {i === 0 && <span className="text-[10px] bg-[#4d0011]/10 text-[#4d0011] px-1.5 py-0.5 rounded-full font-semibold">Latest</span>}

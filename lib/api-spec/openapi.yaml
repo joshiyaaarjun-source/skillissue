@@ -1851,12 +1851,15 @@ components:
         status:
           type: string
           enum: [pending, active, completed]
+        isMutual:
+          type: boolean
       required:
         - id
         - matchedUser
         - createdAt
         - overlappingSkills
         - status
+        - isMutual
 
     CreateExchangeBody:
       type: object

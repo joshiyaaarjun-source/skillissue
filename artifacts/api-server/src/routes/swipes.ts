@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, swipesTable, matchesTable, usersTable, ledgerTable } from "@workspace/db";
-import { eq, and } from "drizzle-orm";
+import { and, desc, eq, or } from "drizzle-orm";
 import { RecordSwipeBody, RecordSwipeResponse } from "@workspace/api-zod";
 
 const router: IRouter = Router();
@@ -14,96 +14,119 @@ router.post("/swipe", async (req, res): Promise<void> => {
   }
 
   const { targetUserId, direction } = parsed.data;
-  const targetIdNum = parseInt(targetUserId, 10);
-
-  const existing = await db.select().from(swipesTable).where(
-    and(
-      eq(swipesTable.swiperId, DEMO_USER_ID),
-      eq(swipesTable.targetId, targetIdNum)
-    )
-  );
-
-  if (existing.length > 0) {
-    res.json(RecordSwipeResponse.parse({ matched: false }));
+  const targetIdNum = Number(targetUserId);
+  if (!/^\d+$/.test(targetUserId) || !Number.isSafeInteger(targetIdNum) || targetIdNum <= 0) {
+    res.status(400).json({ error: "Choose a valid profile to swipe on" });
     return;
   }
 
-  await db.insert(swipesTable).values({
-    swiperId: DEMO_USER_ID,
-    targetId: targetIdNum,
-    direction,
-  });
+  if (targetIdNum === DEMO_USER_ID) {
+    res.status(400).json({ error: "You cannot swipe on your own profile" });
+    return;
+  }
 
-  let matched = false;
-  let matchId: string | undefined;
-  let matchedUser: Record<string, unknown> | undefined;
+  const [targetUser] = await db.select().from(usersTable).where(eq(usersTable.id, targetIdNum));
+  if (!targetUser) {
+    res.status(404).json({ error: "Profile not found" });
+    return;
+  }
 
-  if (direction === "right") {
-    const theirSwipe = await db.select().from(swipesTable).where(
+  const swipeResult = await db.transaction(async tx => {
+    const [existingSwipe] = await tx.select().from(swipesTable).where(
+      and(
+        eq(swipesTable.swiperId, DEMO_USER_ID),
+        eq(swipesTable.targetId, targetIdNum)
+      )
+    ).limit(1);
+
+    if (!existingSwipe) {
+      await tx.insert(swipesTable).values({
+        swiperId: DEMO_USER_ID,
+        targetId: targetIdNum,
+        direction,
+      });
+    }
+
+    const savedDirection = existingSwipe?.direction ?? direction;
+    if (savedDirection !== "right") return { matched: false, matchId: undefined };
+
+    const [theirRightSwipe] = await tx.select().from(swipesTable).where(
       and(
         eq(swipesTable.swiperId, targetIdNum),
         eq(swipesTable.targetId, DEMO_USER_ID),
         eq(swipesTable.direction, "right")
       )
-    );
+    ).limit(1);
 
-    if (theirSwipe.length > 0) {
-      const existingMatch = await db.select().from(matchesTable).where(
+    if (!theirRightSwipe) return { matched: false, matchId: undefined };
+
+    const [existingMatch] = await tx.select().from(matchesTable).where(
+      or(
         and(
           eq(matchesTable.userAId, DEMO_USER_ID),
           eq(matchesTable.userBId, targetIdNum)
+        ),
+        and(
+          eq(matchesTable.userAId, targetIdNum),
+          eq(matchesTable.userBId, DEMO_USER_ID)
         )
-      );
+      )
+    ).orderBy(desc(matchesTable.createdAt)).limit(1);
 
-      if (existingMatch.length === 0) {
-        const [match] = await db.insert(matchesTable).values({
-          userAId: DEMO_USER_ID,
-          userBId: targetIdNum,
-          status: "active",
-        }).returning();
+    if (existingMatch) return { matched: true, matchId: String(existingMatch.id) };
 
-        await db.insert(ledgerTable).values({
-          eventType: "MATCH_CREATED",
-          description: `Match created between users ${DEMO_USER_ID} and ${targetIdNum}`,
-          userId: DEMO_USER_ID,
-          metadata: { matchId: match.id },
-        });
+    const [match] = await tx.insert(matchesTable).values({
+      userAId: DEMO_USER_ID,
+      userBId: targetIdNum,
+      status: "active",
+    }).returning();
 
-        matched = true;
-        matchId = String(match.id);
+    if (!match) return { matched: false, matchId: undefined };
 
-        const [targetUser] = await db.select().from(usersTable).where(eq(usersTable.id, targetIdNum));
-        if (targetUser) {
-          const myUser = await db.select().from(usersTable).where(eq(usersTable.id, DEMO_USER_ID));
-          const mySkillsWanted = myUser[0]?.skillsWanted ?? [];
-          const mySkillsOffered = myUser[0]?.skillsOffered ?? [];
-          const overlapping = [
-            ...mySkillsWanted.filter((s: string) => targetUser.skillsOffered.includes(s)),
-            ...mySkillsOffered.filter((s: string) => targetUser.skillsWanted.includes(s)),
-          ].filter((v, i, a) => a.indexOf(v) === i);
+    await tx.insert(ledgerTable).values({
+      eventType: "MATCH_CREATED",
+      description: `Match created between users ${DEMO_USER_ID} and ${targetIdNum}`,
+      userId: DEMO_USER_ID,
+      metadata: { matchId: match.id },
+    });
 
-          matchedUser = {
-            id: String(targetUser.id),
-            name: targetUser.name,
-            avatar: targetUser.avatar,
-            bio: targetUser.bio,
-            skillsOffered: targetUser.skillsOffered,
-            skillsWanted: targetUser.skillsWanted,
-            credits: targetUser.creditBalance,
-            credibilityScore: targetUser.credibilityScore,
-            matchScore: overlapping.length * 25,
-            overlappingSkills: overlapping,
-          };
-        }
-      }
-    }
+    return { matched: true, matchId: String(match.id) };
+  });
+
+  const response: Record<string, unknown> = { matched: swipeResult.matched };
+  if (swipeResult.matchId) response.matchId = swipeResult.matchId;
+
+  if (swipeResult.matched) {
+    const [myUser] = await db.select().from(usersTable).where(eq(usersTable.id, DEMO_USER_ID));
+    const mySkillsWanted = myUser?.skillsWanted ?? [];
+    const mySkillsOffered = myUser?.skillsOffered ?? [];
+    const overlapping = [
+      ...mySkillsWanted.filter((skill: string) => targetUser.skillsOffered.includes(skill)),
+      ...mySkillsOffered.filter((skill: string) => targetUser.skillsWanted.includes(skill)),
+    ].filter((value, index, values) => values.indexOf(value) === index);
+
+    response.matchedUser = {
+      id: String(targetUser.id),
+      name: targetUser.name,
+      avatar: targetUser.avatar,
+      bio: targetUser.bio || "",
+      skillsOffered: targetUser.skillsOffered,
+      skillsWanted: targetUser.skillsWanted,
+      credits: targetUser.creditBalance,
+      credibilityScore: targetUser.credibilityScore,
+      matchScore: Math.min(100, overlapping.length * 25 + 40),
+      overlappingSkills: overlapping,
+      verificationStatus: targetUser.verificationStatus === "fully_verified"
+        ? "fully_verified"
+        : targetUser.verificationStatus === "quiz_passed" || targetUser.verificationStatus === "partial"
+          ? "partial"
+          : "unverified",
+      exchangeCount: targetUser.exchangeCount || 0,
+      isNew: targetUser.isNew || false,
+    };
   }
 
-  const result: Record<string, unknown> = { matched };
-  if (matchId) result.matchId = matchId;
-  if (matchedUser) result.matchedUser = matchedUser;
-
-  res.json(RecordSwipeResponse.parse(result));
+  res.json(RecordSwipeResponse.parse(response));
 });
 
 export default router;

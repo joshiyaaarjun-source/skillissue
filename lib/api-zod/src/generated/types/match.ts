@@ -14,4 +14,5 @@ export interface Match {
   createdAt: string;
   overlappingSkills: string[];
   status: MatchStatus;
+  isMutual: boolean;
 }
