@@ -2004,7 +2004,7 @@ components:
           type: string
         type:
           type: string
-          enum: [unused_credits, skill_match, streak_reminder, goal_progress, new_match]
+          enum: [unused_credits, skill_match, streak_reminder, goal_progress, new_match, anti_ghosting]
         message:
           type: string
         actionLabel:

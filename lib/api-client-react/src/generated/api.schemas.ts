@@ -200,6 +200,7 @@ export const NudgeType = {
   streak_reminder: "streak_reminder",
   goal_progress: "goal_progress",
   new_match: "new_match",
+  anti_ghosting: "anti_ghosting",
 } as const;
 
 export type NudgePriority = (typeof NudgePriority)[keyof typeof NudgePriority];

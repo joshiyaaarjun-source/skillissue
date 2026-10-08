@@ -332,6 +332,7 @@ export const GetNudgesResponseItem = zod.object({
     "streak_reminder",
     "goal_progress",
     "new_match",
+    "anti_ghosting",
   ]),
   message: zod.string(),
   actionLabel: zod.string().optional(),

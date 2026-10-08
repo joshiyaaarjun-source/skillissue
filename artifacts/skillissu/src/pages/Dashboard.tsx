@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, type Variants } from "framer-motion";
-import { Star, Flame, Zap, ArrowRight, BookOpen, User as UserIcon, Brain, ChevronDown, ChevronUp, CheckCircle2, Lightbulb, AlertCircle, RefreshCw, Map, Swords, Bell, Crown, Flag, Play, Gavel, Users, BookMarked, Sparkles, Radio, Dna } from "lucide-react";
-import { useGetMe, getGetMeQueryKey, useGetNudges, getGetNudgesQueryKey, useGetExchanges, getGetExchangesQueryKey, useGetSkillCoach, getGetSkillCoachQueryKey, useGetNotifications, getGetNotificationsQueryKey } from "@workspace/api-client-react";
+import { Star, Flame, Zap, ArrowRight, BookOpen, User as UserIcon, Brain, ChevronDown, ChevronUp, CheckCircle2, Lightbulb, AlertCircle, RefreshCw, Map, Swords, Bell, Crown, Flag, Play, Gavel, Users, BookMarked, Sparkles, Radio, Dna, Clock } from "lucide-react";
+import { useGetMe, getGetMeQueryKey, useGetNudges, getGetNudgesQueryKey, useGetExchanges, getGetExchangesQueryKey, useGetSkillCoach, getGetSkillCoachQueryKey, useGetNotifications, getGetNotificationsQueryKey, useGetSessionHistory, getGetSessionHistoryQueryKey } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import ColdStartWidget from "@/components/ColdStartWidget";
 import SkillTwinCard from "@/components/SkillTwinCard";
@@ -38,13 +38,14 @@ export default function Dashboard() {
   const { data: exchanges, isLoading: exchangesLoading } = useGetExchanges({ query: { queryKey: getGetExchangesQueryKey() } });
   const { data: coach, isLoading: coachLoading, refetch: refetchCoach } = useGetSkillCoach({ query: { queryKey: getGetSkillCoachQueryKey() } });
   const { data: notifications } = useGetNotifications({ query: { queryKey: getGetNotificationsQueryKey() } });
+  const { data: sessionHistory, isLoading: sessionsLoading } = useGetSessionHistory({ query: { queryKey: getGetSessionHistoryQueryKey() } });
   const [coachExpanded, setCoachExpanded] = useState(false);
 
   const unreadNotifCount = notifications?.filter(n => !n.read).length ?? 0;
   const isElite = me ? (me.credibilityScore >= 4.5 && me.totalExchanges >= 5) : false;
   const queryClient = useQueryClient();
 
-  if (meLoading || nudgesLoading || exchangesLoading) {
+  if (meLoading || nudgesLoading || exchangesLoading || sessionsLoading) {
     return (
       <div className="min-h-[100dvh] p-4 space-y-6 pb-24">
         <Skeleton className="h-24 w-full rounded-2xl" />
@@ -558,6 +559,45 @@ export default function Dashboard() {
             {(!exchanges || exchanges.length === 0) && (
               <div className="text-center py-6 text-sm text-muted-foreground bg-card rounded-xl border border-dashed">
                 No recent exchanges. Time to learn something new!
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* Recent Meetings */}
+        <motion.div variants={itemVariants}>
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <Clock className="h-4 w-4 text-primary" />
+            <h3 className="font-bold text-lg">Recent Meetings</h3>
+            <span className="text-xs text-muted-foreground ml-auto">Completed skill sessions</span>
+          </div>
+          <div className="space-y-3">
+            {[...(sessionHistory ?? [])]
+              .filter(session => session.status === "completed")
+              .sort((a, b) => Date.parse(b.startedAt) - Date.parse(a.startedAt))
+              .slice(0, 3)
+              .map(session => (
+                <div key={session.id} className="bg-card p-3 rounded-xl shadow-sm border border-border flex items-center gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={session.partnerAvatar} />
+                    <AvatarFallback>{session.partnerName.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm truncate">{session.partnerName}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(session.startedAt))}
+                      {" · "}
+                      {Math.max(1, Math.round(session.durationSeconds / 60))} min
+                    </div>
+                  </div>
+                  {session.creditsEarned > 0 && (
+                    <div className="text-sm font-bold text-primary shrink-0">+{session.creditsEarned} C</div>
+                  )}
+                </div>
+              ))}
+            {(!sessionHistory || sessionHistory.filter(session => session.status === "completed").length === 0) && (
+              <div className="text-center py-6 text-sm text-muted-foreground bg-card rounded-xl border border-dashed">
+                Completed meetings will show here after your first skill session.
               </div>
             )}
           </div>
